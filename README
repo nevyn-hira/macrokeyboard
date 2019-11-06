@@ -50,67 +50,71 @@ The keys section allows you to define your keys:
     }
 }`
 
-    The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
-    Action defines what happens:
-        quit:
-            Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
-            Parameters:
-                NONE
-        reload:
-            Reload the configuration. Will only take effect on modifiers and keys (but have no effect on the device used unless a OSError exception is raised).
-            Parameters:
-                NONE
-            i.e.
-                {
-                    "action":"reload
-                }
-        run:
-            Run a script/executable
-            Parameters:
-                executable -    The file to run.
-                parameters -    Optional. String separated parameters.
-            i.e.
-                {
-                    "action":"run",
-                    "executable":"notify-send"
-                    "parameters":"'This is a Heading' 'This is my message body'"
-                }
-        switchto:
-            Switch to an application.
-            Parameters:
-                classname -     class of the application as it appears in wmctrl
-                executable -    Optional. Application to run if window not found.
-            i.e.
-                {
-                    "action":"switchto",
-                    "classname":"gnome-calculator.Gnome-calculator",
-                    "executable":"gnome-calculator"
-                }
-        type:
-            Type a string.
-            Parameters:
-                content -   The string to type. Will not handle unicode characters (known limitation).
-            i.e.
-                {
-                    "action":"type",
-                    "content":"Hello, World!"
-                }
-        unicode:
-            insert a unicode character.
-            Parameters:
-                code -  The hexidecimal number code for unicode characters
-            i.e.
-                {
-                    "action":"unicode",
-                    "code":"1F600"
-                }
+The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
+### Action defines what happens:
+#### quit:
+Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
+##### Parameters:
+**NONE**
+##### Example:
+`{
+    "action":"quit"
+}`
+#### reload:
+Reload the configuration. Will only take effect on modifiers and keys (but have no effect on the device used unless a OSError exception is raised).
+##### Parameters:
+**NONE**
+##### Example:
+`{
+    "action":"reload
+}`
+####run:
+Run a script/executable
+##### Parameters:
+**executable** -    The file to run.
+**parameters** -    Optional. String separated parameters.
+##### Example #####
+`{
+    "action":"run",
+    "executable":"notify-send"
+    "parameters":"'This is a Heading' 'This is my message body'"
+}`
+####switchto:####
+Switch to an application.
+#####Parameters:#####
+**classname** - class of the application as it appears in wmctrl
+**executable** - Optional. Application to run if window not found.
+#####Example#####
+`{
+    "action":"switchto",
+    "classname":"gnome-calculator.Gnome-calculator",
+    "executable":"gnome-calculator"
+}`
+####type:####
+Type a string.
+#####Parameters:#####
+**content** - the string to type. Will not handle unicode characters (known limitation).
+#####Example:#####
+`{
+    "action":"type",
+    "content":"Hello, World!"
+}`
+####unicode:####
+insert a unicode character.
+#####Parameters:#####
+**code** - The hexidecimal number code for unicode characters
+#####Example:#####
+`{
+    "action":"unicode",
+    "code":"1F600"
+}`
 
-        XF86Symbol:
-            Invoke a XF86Symbol (think media keys)
-            Parameters:
-                symbol -    XF86Symbol (http://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols)
-            i.e.
-                {
-                    "action":"XF86Symbol",
-                    "symbol":"XF86AudioLowerVolume"
-                }
+####XF86Symbol:####
+Invoke a XF86Symbol (think media keys)
+#####Parameters:#####
+**symbol** - XF86Symbol (http://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols)
+#####Example:#####
+`{
+    "action":"XF86Symbol",
+    "symbol":"XF86AudioLowerVolume"
+}`
