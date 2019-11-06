@@ -1,0 +1,109 @@
+This is a python script for turning old, otherwise dust collecting keyboards, into macrokeyboards.
+
+What can it do?
+    * You can assign keys to be:
+        * Modifiers. The same sort of functionality as Shift, Alt and Control except that you can pick any arbitary key to be a modifier key.
+        * Unicode. Assign a key to a unicode character (or to several characters with the use of modifier keys).
+        * Switch to an application. If the application can be found, it will switch to it. Otherwise it will run the application for you. Great for development work where you're constantly switching between the same 3 or 4 windows.
+        * Execute a command.
+
+What it should do in the future:
+    * Create a simple copy and paste function for text. Say you're using the same 5 variable names in code... it'd be useful to just be able to assign those names to a key.
+
+What do you need?:
+    * Permissions. You need to set an input device for the keyboard to read access. You should, by default, use an entry in /dev/input/by-id as this is more consistent but means you have to follow the link back to set the permissions. Alternately, add the intended user to the input group (on Ubuntu. Not tested on other distros).
+    * xdotool.
+    * wmctrl.
+    * python dependencies:
+    ** pynput
+
+Configuration:
+    Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined but doesn't allow for comments. You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
+
+    In the root, device MUST be defined i.e.
+    {
+        "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name"
+    }
+
+    Modifier keys are defined as comma separated string. i.e.
+
+    {
+        "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+        "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT"
+    }
+
+    The keys section allows you to define your keys:
+    {
+        "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+        "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT",
+        "keys":{
+            "KEY_1+KEY_LEFTSHIFT":{
+                "action": "type"
+            }
+        }
+    }
+
+    The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
+    Action defines what happens:
+        quit:
+            Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
+            Parameters:
+                NONE
+        reload:
+            Reload the configuration. Will only take effect on modifiers and keys (but have no effect on the device used unless a OSError exception is raised).
+            Parameters:
+                NONE
+            i.e.
+                {
+                    "action":"reload
+                }
+        run:
+            Run a script/executable
+            Parameters:
+                executable -    The file to run.
+                parameters -    Optional. String separated parameters.
+            i.e.
+                {
+                    "action":"run",
+                    "executable":"notify-send"
+                    "parameters":"'This is a Heading' 'This is my message body'"
+                }
+        switchto:
+            Switch to an application.
+            Parameters:
+                classname -     class of the application as it appears in wmctrl
+                executable -    Optional. Application to run if window not found.
+            i.e.
+                {
+                    "action":"switchto",
+                    "classname":"gnome-calculator.Gnome-calculator",
+                    "executable":"gnome-calculator"
+                }
+        type:
+            Type a string.
+            Parameters:
+                content -   The string to type. Will not handle unicode characters (known limitation).
+            i.e.
+                {
+                    "action":"type",
+                    "content":"Hello, World!"
+                }
+        unicode:
+            insert a unicode character.
+            Parameters:
+                code -  The hexidecimal number code for unicode characters
+            i.e.
+                {
+                    "action":"unicode",
+                    "code":"1F600"
+                }
+
+        XF86Symbol:
+            Invoke a XF86Symbol (think media keys)
+            Parameters:
+                symbol -    XF86Symbol (http://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols)
+            i.e.
+                {
+                    "action":"XF86Symbol",
+                    "symbol":"XF86AudioLowerVolume"
+                }
