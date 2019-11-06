@@ -29,24 +29,30 @@ Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. Thi
 
 In the root, device MUST be defined i.e.
 
-`
+```
 {
     "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name"
 }
-`
+```
 
 Modifier keys are defined as comma separated string. i.e.
 
-`{
+```
+
+{
 
     "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
 
     "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT"
 
-}`
+}
+
+```
 
 The keys section allows you to define your keys:
-`{
+```
+
+{
     "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
     "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT",
     "keys":{
@@ -54,7 +60,9 @@ The keys section allows you to define your keys:
             "action": "type"
         }
     }
-}`
+}
+
+```
 
 The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
 
@@ -70,15 +78,13 @@ Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
 
 ##### Example:
 
-`
+```
 
 {
-
     "action":"quit"
-
 }
 
-`
+```
 
 #### reload:
 
@@ -89,13 +95,11 @@ Reload the configuration. Will only take effect on modifiers and keys (but have 
 **NONE**
 
 ##### Example:
-`
+```
 {
-
     "action":"reload"
-
 }
-`
+```
 
 #### run:
 
@@ -109,17 +113,14 @@ Run a script/executable
 
 ##### Example #####
 
-`
+```
 {
-
     "action":"run",
-
     "executable":"notify-send"
-
     "parameters":"'This is a Heading' 'This is my message body'"
 
 }
-`
+```
 
 #### switchto:
 
@@ -133,19 +134,15 @@ Switch to an application.
 
 ##### Example:
 
-`
+```
 
 {
-
     "action":"switchto",
-
     "classname":"gnome-calculator.Gnome-calculator",
-
     "executable":"gnome-calculator"
-
 }
 
-`
+```
 
 #### type:
 
@@ -157,17 +154,14 @@ Type a string.
 
 ##### Example:
 
-`
+```
 
 {
-
     "action":"type",
-
     "content":"Hello, World!"
-
 }
 
-`
+```
 
 #### unicode:
 
@@ -178,14 +172,14 @@ insert a unicode character.
 **code** - The hexidecimal number code for unicode characters
 
 ##### Example
-`
+```
 
 {
     "action":"unicode",
     "code":"1F600"
 }
 
-`
+```
 
 
 #### XF86Symbol:
@@ -201,11 +195,8 @@ Invoke a XF86Symbol (think media keys)
 ```
 
 {
-
     "action":"XF86Symbol",
-
     "symbol":"XF86AudioLowerVolume"
-
 }
 
 ```
