@@ -57,24 +57,43 @@ The keys section allows you to define your keys:
 }`
 
 The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
+
 ### Action defines what happens:
+
 #### quit:
+
 Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
+
 ##### Parameters:
+
 **NONE**
+
 ##### Example:
-`{
+
+`
+{
+
     "action":"quit"
-}`
+
+}
+`
+
 #### reload:
+
 Reload the configuration. Will only take effect on modifiers and keys (but have no effect on the device used unless a OSError exception is raised).
+
 ##### Parameters:
+
 **NONE**
+
 ##### Example:
-`{
+`
+{
     "action":"reload
-}`
-####run:
+}
+`
+
+#### run:
 Run a script/executable
 ##### Parameters:
 **executable** -    The file to run.
