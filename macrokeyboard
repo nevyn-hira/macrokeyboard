@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+# -*- coding: latin-1 -*-
+
+import evdev
+import os.path
+import json
+import sys
+from wmctrl import Window
+from actioner import Actioner
+from modifierkeys import Modifierkeys
+
+VERBOSE = True
+
+class Controller:
+    def __init__( self ):
+        self.modifierkeys = None
+        self.keys = []
+        self.rawkeyboard = None
+        self.device = ''
+        self.config = None
+        self.actioner = Actioner()
+
+    def readConfiguration( self ):
+        homeconf = os.path.join(os.path.expanduser('~'), '.macrokeyboard.json')
+        sysconf = '/etc/macrokeyboard.json'
+        self.config = []
+        if(os.path.exists(homeconf)):
+            configfile = homeconf
+        elif( os.path.exists(sysconf)):
+            configfile = sysconf
+        else:
+            sys.exit('Configuration file not found. Should we try for the file in /etc?')
+        with open(configfile) as json_file:
+            self.config = json.load(json_file)
+
+        if( not 'device' in self.config ):
+            sys.exit('No device defined.')
+        else:
+            self.device = self.config['device']
+            self.modifierkeys = Modifierkeys( self.config['modifier_keys'] )
+
+
+    def initDevice(self):
+        self.rawkeyboard = evdev.InputDevice(self.device)
+        self.rawkeyboard.grab()
+
+
+    def loop(self):
+        self.initDevice()
+        while True:
+            print('I am listening')
+            for event in self.rawkeyboard.read_loop():
+                if event.type == evdev.ecodes.EV_KEY:
+                    key = evdev.categorize(event)
+                    # For future functionality. Allow configuration that looks at window
+                    # class before doing something. i.e. if navigator.Firefox, do something.
+                    active_window = Window.get_active()
+                    if VERBOSE:
+                        print( key.keycode )
+                        print( active_window.wm_class )
+                    reload = False
+                    if( key.keystate == key.key_down ):
+                        if not self.modifierkeys.keydown( key.keycode ):
+                            for ikey in self.config['keys']:
+                                keys = ikey.split('+',1)
+                                if key.keycode == keys[0]:
+                                    if len(keys) == 1:
+                                        if not self.modifierkeys.isModifiers():
+                                            reload = self.actioner.action(self.config['keys'][ikey])
+                                    else:
+                                        if self.modifierkeys.checkmodifiers(keys[1].split('+')):
+                                            reload = self.actioner.action(self.config['keys'][ikey])
+                            if reload:
+                                self.readConfiguration()
+                        elif VERBOSE:
+                            print("Modifier pressed")
+                    elif( key.keystate == key.key_up ):
+                        self.modifierkeys.keyup( key.keycode )
+
+# MAIN
+controller=Controller()
+controller.readConfiguration()
+while True:
+    try:
+        controller.loop()
+    except KeyboardInterrupt:
+        sys.exit(0)
+    except SystemExit:
+        sys.exit(0)
+    except OSError:
+        found=False
+        while not found:
+            found=os.path.exists(controller.device)

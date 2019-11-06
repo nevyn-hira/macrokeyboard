@@ -1,0 +1,35 @@
+{
+    "device":"/dev/input/by-id/usb-CHICONY_USB_NetVista_Full_Width_Keyboard-event-kbd",
+    "modifier_keys":"KEY_LEFTSHIFT,KEY_LEFTCTRL",
+    "keys":{
+        "KEY_ESC":{
+            "action":"unicode",
+            "code":"1F600"
+        },
+        "KEY_1":{
+            "action":"switchto",
+            "classname":"mate-calculator.Mate-calculator",
+            "executable":"mate-calculator"
+        },
+        "KEY_1+KEY_LEFTSHIFT":{
+            "action": "type",
+            "content": "Hello World!"
+        },
+        "KEY_1+KEY_LEFTSHIFT+KEY_LEFTCTRL":{
+            "action": "XF86Symbol",
+            "symbol": "XF86AudioLowerVolume"
+        },
+        "KEY_1+KEY_LEFTCTRL":{
+            "action": "reload"
+        },
+        "KEY_2":{
+            "action": "quit"
+        },
+        "KEY_3":{
+            "action": "run",
+            "executable": "systemctl",
+            "parameters": "suspend"
+        }
+
+    }
+}
