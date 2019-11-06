@@ -30,16 +30,17 @@ Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. Thi
 In the root, device MUST be defined i.e.
 
 `{
-
     "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name"
-
 }`
 
 Modifier keys are defined as comma separated string. i.e.
 
 `{
+
     "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+
     "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT"
+
 }`
 
 The keys section allows you to define your keys:
