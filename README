@@ -22,7 +22,7 @@ You can assign keys to be:
 * xdotool.
 * wmctrl.
 * python dependencies:
- * pynput
+  * pynput
 
 ## Configuration:
 Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined but doesn't allow for comments. You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
