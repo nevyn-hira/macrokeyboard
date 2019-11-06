@@ -71,11 +71,13 @@ Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
 ##### Example:
 
 `
+
 {
 
     "action":"quit"
 
 }
+
 `
 
 #### reload:
@@ -89,57 +91,121 @@ Reload the configuration. Will only take effect on modifiers and keys (but have 
 ##### Example:
 `
 {
-    "action":"reload
+
+    "action":"reload"
+
 }
 `
 
 #### run:
+
 Run a script/executable
+
 ##### Parameters:
+
 **executable** -    The file to run.
+
 **parameters** -    Optional. String separated parameters.
+
 ##### Example #####
-`{
+
+`
+{
+
     "action":"run",
+
     "executable":"notify-send"
+
     "parameters":"'This is a Heading' 'This is my message body'"
-}`
+
+}
+`
+
 ####switchto:####
+
 Switch to an application.
+
 #####Parameters:#####
+
 **classname** - class of the application as it appears in wmctrl
+
 **executable** - Optional. Application to run if window not found.
+
 #####Example#####
-`{
+
+`
+
+{
+
     "action":"switchto",
+
     "classname":"gnome-calculator.Gnome-calculator",
+
     "executable":"gnome-calculator"
-}`
+
+}
+
+`
+
 ####type:####
+
 Type a string.
+
 #####Parameters:#####
+
 **content** - the string to type. Will not handle unicode characters (known limitation).
+
 #####Example:#####
-`{
+
+`
+
+{
+
     "action":"type",
+
     "content":"Hello, World!"
-}`
+
+}
+
+`
+
 ####unicode:####
+
 insert a unicode character.
+
 #####Parameters:#####
+
 **code** - The hexidecimal number code for unicode characters
+
 #####Example:#####
-`{
+`
+
+{
     "action":"unicode",
     "code":"1F600"
-}`
+}
+
+`
+
 
 ####XF86Symbol:####
+
 Invoke a XF86Symbol (think media keys)
+
 #####Parameters:#####
+
 **symbol** - XF86Symbol (http://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols)
+
 #####Example:#####
-`{
+
+`
+
+{
+
     "action":"XF86Symbol",
+
     "symbol":"XF86AudioLowerVolume"
-}`
+
+}
+
+`
