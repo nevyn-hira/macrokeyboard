@@ -1,11 +1,14 @@
 This is a python script for turning old, otherwise dust collecting keyboards, into macrokeyboards.
 
 What can it do?
-    * You can assign keys to be:
-        * Modifiers. The same sort of functionality as Shift, Alt and Control except that you can pick any arbitary key to be a modifier key.
-        * Unicode. Assign a key to a unicode character (or to several characters with the use of modifier keys).
-        * Switch to an application. If the application can be found, it will switch to it. Otherwise it will run the application for you. Great for development work where you're constantly switching between the same 3 or 4 windows.
-        * Execute a command.
+
+You can assign keys to be:
+
+* Modifiers. The same sort of functionality as Shift, Alt and Control except that you can pick any arbitary key to be a modifier key.
+
+* Unicode. Assign a key to a unicode character (or to several characters with the use of modifier keys).
+* Switch to an application. If the application can be found, it will switch to it. Otherwise it will run the application for you. Great for development work where you're constantly switching between the same 3 or 4 windows.
+* Execute a command.
 
 What it should do in the future:
     * Create a simple copy and paste function for text. Say you're using the same 5 variable names in code... it'd be useful to just be able to assign those names to a key.
