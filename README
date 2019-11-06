@@ -121,17 +121,17 @@ Run a script/executable
 }
 `
 
-####switchto:####
+#### switchto:
 
 Switch to an application.
 
-#####Parameters:#####
+##### Parameters:
 
 **classname** - class of the application as it appears in wmctrl
 
 **executable** - Optional. Application to run if window not found.
 
-#####Example#####
+##### Example:
 
 `
 
@@ -147,15 +147,15 @@ Switch to an application.
 
 `
 
-####type:####
+#### type:
 
 Type a string.
 
-#####Parameters:#####
+##### Parameters:
 
 **content** - the string to type. Will not handle unicode characters (known limitation).
 
-#####Example:#####
+##### Example:
 
 `
 
@@ -169,15 +169,15 @@ Type a string.
 
 `
 
-####unicode:####
+#### unicode:
 
 insert a unicode character.
 
-#####Parameters:#####
+##### Parameters:
 
 **code** - The hexidecimal number code for unicode characters
 
-#####Example:#####
+##### Example
 `
 
 {
@@ -188,17 +188,17 @@ insert a unicode character.
 `
 
 
-####XF86Symbol:####
+#### XF86Symbol:
 
 Invoke a XF86Symbol (think media keys)
 
-#####Parameters:#####
+##### Parameters:
 
 **symbol** - XF86Symbol (http://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols)
 
-#####Example:#####
+##### Example:
 
-`
+```
 
 {
 
@@ -208,4 +208,4 @@ Invoke a XF86Symbol (think media keys)
 
 }
 
-`
+```
