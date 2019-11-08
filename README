@@ -1,3 +1,22 @@
+# License
+
+Copyright 2019 Nilesh "Nevyn" Hira
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Author: Nevyn Hira (nevynh@gmail.com)
+
 # Macrokeyboard Script
 
 This is a python script for turning old, otherwise dust collecting keyboards, into macrokeyboards.
@@ -21,8 +40,7 @@ You can assign keys to be:
 * Permissions. You need to set an input device for the keyboard to read access. You should, by default, use an entry in /dev/input/by-id as this is more consistent but means you have to follow the link back to set the permissions. Alternately, add the intended user to the input group (on Ubuntu. Not tested on other distros).
 * xdotool.
 * wmctrl.
-* python dependencies:
-  * pynput
+* pynput
 
 ## Configuration:
 Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined but doesn't allow for comments. You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
