@@ -36,7 +36,10 @@ class Actioner:
         return False
 
     def execute(self, executable, parameters):
-        subprocess.call([executable] + shlex.split(parameters))
+        if(parameters):
+            subprocess.call([executable] + shlex.split(parameters))
+        else:
+            subprocess.call([executable])
 
     def pressXF86Symbol(self, symbol):
         self.execute('xdotool','key ' + symbol)
