@@ -48,7 +48,6 @@ class Controller:
     def loop(self):
         self.initDevice()
         while True:
-            print('I am listening')
             for event in self.rawkeyboard.read_loop():
                 if event.type == evdev.ecodes.EV_KEY:
                     key = evdev.categorize(event)
