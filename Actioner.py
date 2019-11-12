@@ -3,7 +3,6 @@ import sys
 import shlex
 import subprocess
 from wmctrl import Window
-import os
 
 class Actioner:
     def __init__( self ):

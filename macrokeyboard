@@ -79,8 +79,6 @@ class Controller:
                         self.actioner.execute('xdotool','key Num_Lock')
                 if event.type == evdev.ecodes.EV_KEY:
                     key = evdev.categorize(event)
-                    # For future functionality. Allow configuration that looks at window
-                    # class before doing something. i.e. if navigator.Firefox, do something.
                     try:
                         active_window = Window.get_active()
                     except:
@@ -100,7 +98,6 @@ class Controller:
                                 if key.keycode == keys[0]:
                                     if len(keys) == 1:
                                         if not self.modifierkeys.isModifiers():
-                                            # Here we should have the key. We should be able to check for context.
                                             if "context_role" in self.config.config['keys'][ikey]:
                                                 if active_window.wm_window_role in self.config.config['keys'][ikey]['context_role']:
                                                     action = True
