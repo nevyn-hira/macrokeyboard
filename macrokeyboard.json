@@ -1,19 +1,38 @@
 {
     "device":"/dev/input/by-id/usb-CHICONY_USB_NetVista_Full_Width_Keyboard-event-kbd",
     "modifier_keys":"KEY_LEFTSHIFT,KEY_LEFTCTRL",
+    "disable_capslock": true,
+    "force_numlock": true,
     "keys":{
         "KEY_ESC":{
-            "action":"unicode",
-            "code":"1F600"
+            "action":"reload"
+        },
+        "KEY_DELETE":{
+            "action":"switchto",
+            "classname":"keepass2.KeePass2",
+            "executable":"keepass2"
+        },
+        "KEY_INSERT":{
+            "action":"switchto",
+            "classname":"code.Code",
+            "executable":"code"
+        },
+        "KEY_HOME":{
+            "action":"switchto",
+            "classname":"Navigator.Firefox",
+            "executable":"firefox"
         },
         "KEY_1":{
-            "action":"switchto",
-            "classname":"mate-calculator.Mate-calculator",
-            "executable":"mate-calculator"
-        },
-        "KEY_1+KEY_LEFTSHIFT":{
-            "action": "type",
-            "content": "Hello World!"
+            "context":{
+                "caja.Caja":{
+                    "action": "run",
+                    "executable":"notify-send",
+                    "parameters":"Hello World!"
+                }
+            },
+            "action": "run",
+            "executable": "mate-screenshot",
+            "parameters": "-a"
         },
         "KEY_1+KEY_LEFTSHIFT+KEY_LEFTCTRL":{
             "action": "XF86Symbol",
@@ -29,7 +48,11 @@
             "action": "run",
             "executable": "systemctl",
             "parameters": "suspend"
+        },
+        "KEY_NUMLOCK":{
+            "action": "switchto",
+            "classname":"vlc.vlc",
+            "executable":""
         }
-
     }
 }

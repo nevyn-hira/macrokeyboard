@@ -67,6 +67,19 @@ Modifier keys are defined as comma separated string. i.e.
 
 ```
 
+You can decide whether you want to disable the caps lock key:
+```
+{
+
+    "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+
+    "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT",
+
+    "disable_capslock":true
+
+}
+```
+
 The keys section allows you to define your keys:
 ```
 
@@ -83,6 +96,24 @@ The keys section allows you to define your keys:
 ```
 
 The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
+
+Macros may be assigned to the context of programs. The "context" is the wm_class name. This can be found by running macrokeyboard with the --verbose switch, making the desired application active and pressing a key on the macrokeyboard.
+
+```
+...
+{
+    "keys":{
+        "KEY_1":{
+            "context":{
+                "Navigator.Firefox":{
+                    "action":"type",
+                    "content":"I will only do this if 1 is pressed when firefox is active"
+                }
+            }
+        }
+    }
+}
+```
 
 ### Action defines what happens:
 
