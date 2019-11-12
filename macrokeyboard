@@ -105,7 +105,7 @@ class Controller:
                                             if not action and "context_class" in self.config.config['keys'][ikey]:
                                                 if active_window.wm_class in self.config.config['keys'][ikey]['context_class']:
                                                     action = True
-                                                    action_info = self.config.config['keys'][ikey]['context'][active_window.wm_class]
+                                                    action_info = self.config.config['keys'][ikey]['context_class'][active_window.wm_class]
                                             if not action:
                                                 action_info = self.config.config['keys'][ikey]
                                                 action = True
