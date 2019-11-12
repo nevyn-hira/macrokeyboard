@@ -23,7 +23,13 @@
             "executable":"firefox"
         },
         "KEY_1":{
-            "context":{
+            "context_role":{
+                "GtkFileChooserDialog":{
+                    "action":"gotolocation",
+                    "location":"~/Pictures"
+                }
+            },
+            "context_class":{
                 "caja.Caja":{
                     "action": "run",
                     "executable":"notify-send",

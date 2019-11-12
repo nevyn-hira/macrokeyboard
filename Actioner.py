@@ -3,6 +3,7 @@ import sys
 import shlex
 import subprocess
 from wmctrl import Window
+import os
 
 class Actioner:
     def __init__( self ):
@@ -31,6 +32,8 @@ class Actioner:
             else:
                 parameters = []
             self.execute(actioninfo['executable'],parameters)
+        elif action == "gotolocation":
+            self.gotoLocation( actioninfo['location'] )
 
     def execute(self, executable, parameters):
         if(parameters):
@@ -40,7 +43,6 @@ class Actioner:
 
     def pressXF86Symbol(self, symbol):
         self.execute('xdotool','key ' + symbol)
-        # subprocess.call(['xdotool','key',symbol])
 
     def typeUnicodeSymbol( self, code ):
         self.keyboardcontroller.press(Key.ctrl)
@@ -60,3 +62,11 @@ class Actioner:
         
     def type( self, content ):
         self.keyboardcontroller.type(str(content))
+    
+    def gotoLocation( self, location ):
+        self.keyboardcontroller.press(Key.ctrl)
+        self.keyboardcontroller.type('l')
+        self.keyboardcontroller.release(Key.ctrl)
+        self.keyboardcontroller.type(location)
+        self.keyboardcontroller.press(Key.enter)
+        self.keyboardcontroller.release(Key.enter)

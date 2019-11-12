@@ -97,14 +97,20 @@ The keys section allows you to define your keys:
 
 The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
 
-Macros may be assigned to the context of programs. The "context" is the wm_class name. This can be found by running macrokeyboard with the --verbose switch, making the desired application active and pressing a key on the macrokeyboard.
+Macros may be assigned to the context of programs. The "context" is either the wm_window_role OR the wm_class name. This can be found by running macrokeyboard with the --verbose switch, making the desired application active and pressing a key on the macrokeyboard. wm_window_role takes precedence.
 
 ```
 ...
 {
     "keys":{
         "KEY_1":{
-            "context":{
+            "context_role":{
+                "GtkFileChooserDialog":{
+                    "action":"gotolocation",
+                    "location":"~/Pictures"
+                }
+            }
+            "context_class":{
                 "Navigator.Firefox":{
                     "action":"type",
                     "content":"I will only do this if 1 is pressed when firefox is active"
@@ -117,22 +123,19 @@ Macros may be assigned to the context of programs. The "context" is the wm_class
 
 ### Action defines what happens:
 
-#### quit:
+#### gotolocation
 
-Quit modifier keyboard (freeing the keyboard). Probably no longer needed.
+Primarily meant for use with GtkFileChooserDialog when using context_role. Quickly goes to a defined location.
 
 ##### Parameters:
-
-**NONE**
+** location ** - The location to go to.
 
 ##### Example:
-
 ```
-
 {
-    "action":"quit"
+    "action":"gotolocation",
+    "location":"~/Pictures"
 }
-
 ```
 
 #### reload:

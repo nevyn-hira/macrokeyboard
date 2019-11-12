@@ -86,9 +86,10 @@ class Controller:
                     except:
                         pass
                     if VERBOSE:
-                        print( key.keycode )
+                        print( 'Keycode: ' + key.keycode )
                         try:
-                            print( active_window.wm_class )
+                            print( '  wm_class:       ' + active_window.wm_class )
+                            print( '  wm_window_role: ' + active_window.wm_window_role )
                         except:
                             pass
                     if( key.keystate == key.key_down ):
@@ -100,8 +101,12 @@ class Controller:
                                     if len(keys) == 1:
                                         if not self.modifierkeys.isModifiers():
                                             # Here we should have the key. We should be able to check for context.
-                                            if "context" in self.config.config['keys'][ikey]:
-                                                if active_window.wm_class in self.config.config['keys'][ikey]['context']:
+                                            if "context_role" in self.config.config['keys'][ikey]:
+                                                if active_window.wm_window_role in self.config.config['keys'][ikey]['context_role']:
+                                                    action = True
+                                                    action_info = self.config.config['keys'][ikey]['context_role'][active_window.wm_window_role]
+                                            if not action and "context_class" in self.config.config['keys'][ikey]:
+                                                if active_window.wm_class in self.config.config['keys'][ikey]['context_class']:
                                                     action = True
                                                     action_info = self.config.config['keys'][ikey]['context'][active_window.wm_class]
                                             if not action:
@@ -109,7 +114,6 @@ class Controller:
                                                 action = True
                                     else:
                                         if self.modifierkeys.checkmodifiers(keys[1].split('+')):
-                                            # Here we should have the key. We should be able to check for context
                                             action_info = self.config.config['keys'][ikey]
                                             action = True
                                     if action:
