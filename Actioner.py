@@ -33,6 +33,34 @@ class Actioner:
             self.execute(actioninfo['executable'],parameters)
         elif action == "gotolocation":
             self.gotoLocation( actioninfo['location'] )
+        elif action == "keysequence":
+            self.keySequence( actioninfo['sequence'] )
+            return(action)
+
+    def keySequence(self, sequence):
+        items = sequence.split('|')
+        for item in items:
+            i = item.split('+')
+            pressList = []
+            if len(i)>1:
+                for u in i:
+                    if u.startswith('Key.'):
+                        self.keyboardcontroller.press(eval(u))
+                        pressList.append(u)
+                    else:
+                        self.keyboardcontroller.type(u)
+                for key in pressList:
+                    self.keyboardcontroller.release(eval(key))
+            else:
+                i = i[0]
+                if i.startswith('Key.'):
+                    self.keyboardcontroller.press(eval(i))
+                    pressList.append(i)
+                else:
+                    self.keyboardcontroller.type(i)
+                for key in pressList:
+                    self.keyboardcontroller.release(eval(key))
+
 
     def execute(self, executable, parameters):
         if(parameters):
@@ -44,12 +72,7 @@ class Actioner:
         self.execute('xdotool','key ' + symbol)
 
     def typeUnicodeSymbol( self, code ):
-        self.keyboardcontroller.press(Key.ctrl)
-        self.keyboardcontroller.press(Key.shift)
-        self.keyboardcontroller.press('u')
-        self.keyboardcontroller.release(Key.shift)
-        self.keyboardcontroller.release(Key.ctrl)
-        self.keyboardcontroller.type(str(code)+' ')
+        self.keySequence('Key.ctrl+Key.shift+u|'+str(code)+"|Key.enter")
     
     def switchTo( self, classname, command ):
         for window in Window.list():
@@ -63,9 +86,4 @@ class Actioner:
         self.keyboardcontroller.type(str(content))
     
     def gotoLocation( self, location ):
-        self.keyboardcontroller.press(Key.ctrl)
-        self.keyboardcontroller.type('l')
-        self.keyboardcontroller.release(Key.ctrl)
-        self.keyboardcontroller.type(location)
-        self.keyboardcontroller.press(Key.enter)
-        self.keyboardcontroller.release(Key.enter)
+        self.keySequence('Key.ctrl+l|'+location+'|Key.enter')

@@ -88,6 +88,7 @@ class Controller:
                         try:
                             print( '  wm_class:       ' + active_window.wm_class )
                             print( '  wm_window_role: ' + active_window.wm_window_role )
+                            print( active_window )
                         except:
                             pass
                     if( key.keystate == key.key_down ):

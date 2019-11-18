@@ -48,12 +48,17 @@
             "action": "reload"
         },
         "KEY_2":{
-            "action": "quit"
+            "action": "keysequence",
+            "sequence": "Key.ctrl+l|~/Pictures|Key.enter"
         },
         "KEY_3":{
             "action": "run",
             "executable": "systemctl",
             "parameters": "suspend"
+        },
+        "KEY_4":{
+            "action": "unicode",
+            "code": "b0"
         },
         "KEY_NUMLOCK":{
             "action": "switchto",

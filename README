@@ -27,23 +27,24 @@ You can assign keys to be:
 
 * Modifiers. The same sort of functionality as Shift, Alt and Control except that you can pick any arbitary key to be a modifier key.
 
-
 * Unicode. Assign a key to a unicode character (or to several characters with the use of modifier keys).
+
 * Switch to an application. If the application can be found, it will switch to it. Otherwise it will run the application for you. Great for development work where you're constantly switching between the same 3 or 4 windows.
+
+* Context aware actions: You can configure it to be aware of the application/dialogue you're in and do an action based on this.
+
 * Execute a command.
 
 ## What it should do in the future:
 * Create a simple copy and paste function for text. Say you're using the same 5 variable names in code... it'd be useful to just be able to assign those names to a key.
-* Allow for configuration file to be specified on the commandline to enable multiple macro keyboards.
 
 ## What do you need?:
-* Permissions. You need to set an input device for the keyboard to read access. You should, by default, use an entry in /dev/input/by-id as this is more consistent but means you have to follow the link back to set the permissions. Alternately, add the intended user to the input group (on Ubuntu. Not tested on other distros).
-* xdotool.
-* wmctrl.
+* Permissions. You need to set an input device for the keyboard to read access. You should, by default, use an entry in /dev/input/by-id as this is more consistent but means you have to follow the link back to set the permissions. Add the intended user to the input group (on Ubuntu. Not tested on other distros).
+* xdotool
 * pynput
 
 ## Configuration:
-Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined but doesn't allow for comments. You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
+Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined (but doesn't allow for comments. It should be trivial to go and strip out comments before doing anything on it...). You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
 
 In the root, device MUST be defined i.e.
 
@@ -125,7 +126,7 @@ Macros may be assigned to the context of programs. The "context" is either the w
 
 #### gotolocation
 
-Primarily meant for use with GtkFileChooserDialog when using context_role. Quickly goes to a defined location.
+Primarily meant for use with GtkFileChooserDialog when using context_role. Quickly goes to a defined location. It's just a series of keypresses (Ctrl+L, type location, press enter).
 
 ##### Parameters:
 ** location ** - The location to go to.
@@ -137,6 +138,22 @@ Primarily meant for use with GtkFileChooserDialog when using context_role. Quick
     "location":"~/Pictures"
 }
 ```
+
+#### keysequence:
+Type a sequence of keys.
+
+#### Parameters:
+** sequence ** - the sequence of keys to type. These need to be pipe separated. Keys that need to pressed in conjunction with other keys can be linked together with a + symbol. Special keys can be defined using key.[Key] where [Key] is defined here: https://github.com/moses-palmer/pynput/blob/master/lib/pynput/keyboard/_xorg.py. Search for class Key.
+
+##### Example:
+```
+{
+    "action":"keysequence",
+    "sequence":"Key.ctrl+l|~/Pictures|Key.enter"
+}
+```
+This will do the same thing as "gotolocation"
+
 
 #### reload:
 
