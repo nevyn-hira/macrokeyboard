@@ -33,6 +33,8 @@ You can assign keys to be:
 
 * Context aware actions: You can configure it to be aware of the application/dialogue you're in and do an action based on this.
 
+* Perform "macros" i.e. enter in a sequence of key presses.
+
 * Execute a command.
 
 ## What it should do in the future:
