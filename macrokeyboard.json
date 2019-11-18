@@ -56,7 +56,7 @@
             "executable": "systemctl",
             "parameters": "suspend"
         },
-        "KEY_4":{
+        "KEY_5":{
             "action": "unicode",
             "code": "b0"
         },
