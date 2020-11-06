@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+# -*- coding: latin-1 -*-
+
+import evdev
+import os
+import json
+import sys
+import getopt
+from wmctrl import Window
+from Actioner import Actioner
+from modifierkeys import Modifierkeys
+
+def print_help():
+    helptext="""\
+Usage:
+  macrokeyboard -v -c <config_file>
+
+Configuration file is in json format and needs to have device defined.
+-v  :  verbose. Use this mode if you want to see the key codes and the window classes.
+/"""
+    print("\n\n"+helptext+"\n\n")
+
+class Configuration:
+    def __init__( self, configFile ):
+        self.config_file = configFile
+        self.config = []
+        self.readConfiguration()
+
+    def readConfiguration( self ):
+        if not os.path.exists(self.config_file):
+            sys.exit('Configuration file not found.')
+            sys.exit(1)
+        with open(self.config_file) as json_file:
+            self.config = json.load(json_file)
+        if( not 'device' in self.config ):
+            sys.exit('No device defined.')
+        else:
+            self.device = self.config['device']
+            self.modifierkeys = Modifierkeys( self.config['modifier_keys'] )
+
+class Controller:
+    def __init__( self, configfile ):
+        self.modifierkeys = None
+        self.keys = []
+        self.rawkeyboard = None
+        self.config = Configuration( configfile )
+        self.device = self.config.device
+        self.modifierkeys = self.config.modifierkeys
+        self.actioner = Actioner()
+        self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+        # pass any mime type lists to actioner...
+
+    def initDevice(self):
+        if os.access( self.device,os. R_OK ):
+            self.rawkeyboard = evdev.InputDevice(self.device)
+            self.rawkeyboard.grab()
+        else:
+            sys.exit('No read access to input device')
+
+    def loop(self, VERBOSE):
+        self.initDevice()
+        DISABLECAPS = False
+        FORCENUMLOCK = False
+        if "disable_capslock" in self.config.config:
+            if self.config.config["disable_capslock"]:
+                DISABLECAPS = True
+                if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
+                    self.actioner.execute('xdotool','key Caps_Lock')
+        if "force_numlock" in self.config.config:
+            if self.config.config["force_numlock"]:
+                FORCENUM = True
+                if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
+                    self.actioner.execute('xdotool','key Num_Lock')
+        while True:
+            for event in self.rawkeyboard.read_loop():
+                if DISABLECAPS:
+                    if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
+                        self.actioner.execute('xdotool','key Caps_Lock')
+                if FORCENUM:
+                    if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
+                        self.actioner.execute('xdotool','key Num_Lock')
+                if event.type == evdev.ecodes.EV_KEY:
+                    key = evdev.categorize(event)
+                    try:
+                        active_window = Window.get_active()
+                    except:
+                        pass
+                    if VERBOSE:
+                        print( 'Keycode: ' + key.keycode )
+                        try:
+                            print( '  wm_class:       ' + active_window.wm_class )
+                            print( '  wm_window_role: ' + active_window.wm_window_role )
+                        except:
+                            pass
+                    if( key.keystate == key.key_down ):
+                        if not self.modifierkeys.keydown( key.keycode ):
+                            for ikey in self.config.config['keys']:
+                                action = False
+                                keys = ikey.split('+',1)
+                                if key.keycode == keys[0]:
+                                    if len(keys) == 1:
+                                        if not self.modifierkeys.isModifiers():
+                                            if "context_role" in self.config.config['keys'][ikey]:
+                                                if active_window.wm_window_role in self.config.config['keys'][ikey]['context_role']:
+                                                    action = True
+                                                    action_info = self.config.config['keys'][ikey]['context_role'][active_window.wm_window_role]
+                                            if not action and "context_class" in self.config.config['keys'][ikey]:
+                                                if active_window.wm_class in self.config.config['keys'][ikey]['context_class']:
+                                                    action = True
+                                                    action_info = self.config.config['keys'][ikey]['context_class'][active_window.wm_class]
+                                            if not action:
+                                                action_info = self.config.config['keys'][ikey]
+                                                action = True
+                                    else:
+                                        if self.modifierkeys.checkmodifiers(keys[1].split('+')):
+                                            action_info = self.config.config['keys'][ikey]
+                                            action = True
+                                    if action:
+                                        if 'action' in action_info:
+                                            if action_info['action'] == 'reload':
+                                                self.config.readConfiguration()
+                                                self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+                                            else:
+                                                self.actioner.action(action_info)
+                                        else:
+                                            print("ERROR: " + str(action_info))
+                                    action = False
+                                    
+                        elif VERBOSE:
+                            print("Modifier pressed")
+                    elif( key.keystate == key.key_up ):
+                        self.modifierkeys.keyup( key.keycode )
+
+# MAIN
+def main(argv):
+    # Commandline parameters
+    configFile = os.path.join(os.path.expanduser('~'), '.macrokeyboard.json')
+    VERBOSE = False
+    try:
+        opts, args = getopt.getopt(argv, "hvc:", ["help,verbose,config="])
+    except getopt.GetoptError:
+        print_help()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ["-h","--help"]:
+            print_help()
+            sys.exit()
+        elif opt in [ "-v", "--verbose" ]:
+            VERBOSE = True
+        elif opt in [ "-c", "--config" ]:
+            configFile = arg
+
+    controller = Controller(configFile)
+    while True:
+        try:
+            controller.loop(VERBOSE)
+        except KeyboardInterrupt:
+            sys.exit(0)
+        except OSError:
+            found=False
+            while not found:
+                found=os.path.exists(controller.device)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        main(sys.argv[1:])
+    else:
+        main([])
