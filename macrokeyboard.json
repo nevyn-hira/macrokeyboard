@@ -1,6 +1,6 @@
-{
+ {
     "device":"/dev/input/by-id/usb-CHICONY_USB_NetVista_Full_Width_Keyboard-event-kbd",
-    "modifier_keys":"KEY_LEFTSHIFT,KEY_LEFTCTRL",
+    "modifier_keys":"KEY_LEFTSHIFT,KEY_LEFTCTRL,KEY_KPENTER",
     "disable_capslock": true,
     "force_numlock": true,
     "keys":{
@@ -55,6 +55,10 @@
             "action": "run",
             "executable": "systemctl",
             "parameters": "suspend"
+        },
+        "KEY_4":{
+            "action":"run",
+            "executable": "/home/nevyn/macrokeyboard/attachScreenshot"
         },
         "KEY_5":{
             "action": "unicode",

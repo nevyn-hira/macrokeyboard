@@ -9,6 +9,7 @@ import getopt
 from wmctrl import Window
 from Actioner import Actioner
 from modifierkeys import Modifierkeys
+import notify2 as notify
 
 def print_help():
     helptext="""\
@@ -47,6 +48,8 @@ class Controller:
         self.device = self.config.device
         self.modifierkeys = self.config.modifierkeys
         self.actioner = Actioner()
+        self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+        # pass any mime type lists to actioner...
 
     def initDevice(self):
         if os.access( self.device,os. R_OK ):
@@ -69,6 +72,9 @@ class Controller:
                 FORCENUM = True
                 if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
                     self.actioner.execute('xdotool','key Num_Lock')
+        if "launch-notify" in self.config.config:
+            if self.config.config["launch-notify"]:
+                self.actioner.setNotifications()
         while True:
             for event in self.rawkeyboard.read_loop():
                 if DISABLECAPS:
@@ -88,7 +94,6 @@ class Controller:
                         try:
                             print( '  wm_class:       ' + active_window.wm_class )
                             print( '  wm_window_role: ' + active_window.wm_window_role )
-                            print( active_window )
                         except:
                             pass
                     if( key.keystate == key.key_down ):
@@ -115,11 +120,15 @@ class Controller:
                                             action_info = self.config.config['keys'][ikey]
                                             action = True
                                     if action:
-                                        if action_info['action'] == 'reload':
-                                            self.config.readConfiguration()
+                                        if 'action' in action_info:
+                                            if action_info['action'] == 'reload':
+                                                self.config.readConfiguration()
+                                                self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+                                            else:
+                                                self.actioner.action(action_info)
                                         else:
-                                            self.actioner.action(action_info)
-                                        action = False
+                                            print("ERROR: " + str(action_info))
+                                    action = False
                                     
                         elif VERBOSE:
                             print("Modifier pressed")
@@ -129,6 +138,7 @@ class Controller:
 # MAIN
 def main(argv):
     # Commandline parameters
+    notify.init("MacroKeyboard")
     configFile = os.path.join(os.path.expanduser('~'), '.macrokeyboard.json')
     VERBOSE = False
     try:
@@ -145,14 +155,14 @@ def main(argv):
         elif opt in [ "-c", "--config" ]:
             configFile = arg
 
-    controller = Controller( configFile )
+    controller = Controller(configFile)
     while True:
         try:
             controller.loop(VERBOSE)
         except KeyboardInterrupt:
             sys.exit(0)
         except OSError:
-            found=False
+            found = False
             while not found:
                 found=os.path.exists(controller.device)
 
