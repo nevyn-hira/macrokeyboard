@@ -3,20 +3,24 @@ import sys
 import shlex
 import subprocess
 import magic
+import os
 from wmctrl import Window
+from pynotifier import Notification
 import pyperclip
-import notify2 as notify
+
 
 class Actioner:
     def __init__( self ):
         self.keyboardcontroller = keyboardController()
+        self.launchnotifications = False
+        self.launchicon = os.path.dirname(os.path.realpath(__file__)) + '/launch.png'
+
     def populateMimeLists(self, mimelists):
         self.mimelists = mimelists
         print(self.mimelists)
 
     def setNotifications( self ):
         self.launchnotifications = True
-        notify.init("Macro Keyboard")
 
     def action( self, actioninfo ):
         action = actioninfo['action']
@@ -25,9 +29,14 @@ class Actioner:
                 actioninfo['classname'],
                 actioninfo['executable'] )):
                 if( self.launchnotifications ):
-                    n = notify.Notification("Launching", str(actioninfo['executable']), "notification-message-im")
-                    n.show()
-                    
+                    Notification(
+                        title = 'Launching',
+                        description = os.path.basename(actioninfo['executable']),
+                        icon_path = self.launchicon,
+                        duration = 2,
+                        urgency = Notification.URGENCY_CRITICAL
+                    ).send()
+
         elif action == 'XF86Symbol':
             self.pressXF86Symbol(
                 actioninfo['symbol'] )
