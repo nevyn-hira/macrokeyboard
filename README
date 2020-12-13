@@ -156,6 +156,19 @@ Type a sequence of keys.
 ```
 This will do the same thing as "gotolocation"
 
+#### exit:
+Exit macrokeyboard. Great if you want to quit macrokeyboard so that you can rerun it in a terminal in verbose mode for configuration.
+
+##### Parameters:
+
+**NONE**
+
+##### Example:
+```
+{
+    "action":"exit"
+}
+```
 
 #### reload:
 

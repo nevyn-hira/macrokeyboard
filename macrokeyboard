@@ -124,12 +124,11 @@ class Controller:
                                             if action_info['action'] == 'reload':
                                                 self.config.readConfiguration()
                                                 self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+                                            elif action_info['action'] == 'exit':
+                                                sys.exit(0)
                                             else:
                                                 self.actioner.action(action_info)
-                                        else:
-                                            print("ERROR: " + str(action_info))
-                                    action = False
-                                    
+                                    action = False            
                         elif VERBOSE:
                             print("Modifier pressed")
                     elif( key.keystate == key.key_up ):
@@ -158,7 +157,8 @@ def main(argv):
     controller = Controller(configFile)
     while True:
         try:
-            controller.loop(VERBOSE)
+            while True:
+                controller.loop(VERBOSE)
         except KeyboardInterrupt:
             sys.exit(0)
         except OSError:

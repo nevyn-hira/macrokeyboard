@@ -7,6 +7,9 @@
         "KEY_ESC":{
             "action":"reload"
         },
+        "KEY_ESC+KEY_LEFTSHIFT":{
+            "action":"exit"
+        },
         "KEY_DELETE":{
             "action":"switchto",
             "classname":"keepass2.KeePass2",
@@ -68,6 +71,10 @@
             "action": "switchto",
             "classname":"vlc.vlc",
             "executable":""
+        },
+        "KEY_ENTER":{
+            "action":"type",
+            "content":"Hello, World!"
         }
     }
 }
