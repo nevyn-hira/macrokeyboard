@@ -8,7 +8,6 @@ from wmctrl import Window
 from pynotifier import Notification
 import pyperclip
 
-
 class Actioner:
     def __init__( self ):
         self.keyboardcontroller = keyboardController()
@@ -125,4 +124,3 @@ class Actioner:
 
     def gotoLocation( self, location ):
         self.keySequence('Key.ctrl+l|'+location+'|Key.enter')
-
