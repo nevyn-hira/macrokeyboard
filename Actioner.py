@@ -7,16 +7,18 @@ import os
 from wmctrl import Window
 from pynotifier import Notification
 import pyperclip
+from ExtendedClipboard import Clipboard
+import time
 
 class Actioner:
     def __init__( self ):
         self.keyboardcontroller = keyboardController()
         self.launchnotifications = False
         self.launchicon = os.path.dirname(os.path.realpath(__file__)) + '/launch.png'
+        self.clipboard = Clipboard()
 
-    def populateMimeLists(self, mimelists):
+    def populateMimeLists( self, mimelists ):
         self.mimelists = mimelists
-        print(self.mimelists)
 
     def setNotifications( self ):
         self.launchnotifications = True
@@ -24,84 +26,97 @@ class Actioner:
     def action( self, actioninfo ):
         action = actioninfo['action']
         if action == 'switchto':
-            if( self.switchTo(
-                actioninfo['classname'],
-                actioninfo['executable'] )):
+            if( self.switchTo( actioninfo['classname'], actioninfo['executable'] )):
                 if( self.launchnotifications ):
-                    Notification(
-                        title = 'Launching',
-                        description = os.path.basename(actioninfo['executable']),
-                        icon_path = self.launchicon,
-                        duration = 2,
-                        urgency = Notification.URGENCY_CRITICAL
-                    ).send()
+                    try:
+                        Notification(
+                            title = 'Launching',
+                            description = os.path.basename(actioninfo['executable']),
+                            icon_path = self.launchicon,
+                            duration = 2,
+                            urgency = Notification.URGENCY_CRITICAL
+                        ).send()
+                    except:
+                        pass
 
         elif action == 'XF86Symbol':
             self.pressXF86Symbol(
-                actioninfo['symbol'] )
+                actioninfo[ 'symbol' ])
         elif action == 'unicode':
             self.typeUnicodeSymbol(
-                actioninfo['code'] )
+                actioninfo[ 'code' ])
         elif action == 'quit':
             sys.exit(0)
         elif action == 'type':
             self.type(
-                actioninfo['content'] )
+                actioninfo[ 'content' ])
         elif action == 'run':
-            if 'parameters' in actioninfo:
-                parameters = actioninfo['parameters']
-            else:
-                parameters = []
-            self.execute(actioninfo['executable'],parameters)
+            self.execute(
+                actioninfo[ 'executable' ],
+                actioninfo[ 'parameters' ] if 'parameters' in actioninfo else [])
         elif action == "gotolocation":
             self.gotoLocation( actioninfo['location'] )
         elif action == "keysequence":
             self.keySequence( actioninfo['sequence'] )
-            return(action)
+            return( action )
         elif action == "altopen":
-            self.openAlt(actioninfo["mimelist"])
+            self.openAlt( actioninfo["mimelist"] )
+# Attempts for a copy/paste buffer. Not currently working.
+        # elif action == "copy":
+        #     self.clipboard.saveClipboard()
+        #     self.keySequence( "Key.ctrl+c" )
+        #     self.clipboard.put( actioninfo['buffer'] )
+        #     self.clipboard.restoreClipboard()
+        #     print(self.clipboard.buffer)
+        # elif action == "paste":
+        #     self.clipboard.saveClipboard()
+        #     self.clipboard.get( actioninfo['buffer'] )
+        #     self.keySequence( "Key.ctrl+v" )
+        #     self.clipboard.restoreClipboard()
+        #     print(self.clipboard.buffer)
 
     def openAlt(self, mimelist):
         list = self.mimelists[mimelist]
-        self.execute("xdotool","key ctrl+c")
+        self.keySequence('Key.ctrl+c')
         files = pyperclip.paste().split("\n")
         for file in files:
             fmimetype = magic.from_file( file, mime=True )
             if fmimetype in self.mimelists[mimelist]:
-                subprocess.call(['gtk-launch',self.mimelists[mimelist][fmimetype],file])
+                subprocess.call( ['gtk-launch', 
+                    self.mimelists[ mimelist ][ fmimetype ], file] )
             else:
                 print(fmimetype)
 
     def keySequence(self, sequence):
-        items = sequence.split('|')
+        items = sequence.split( '|' )
         for item in items:
-            i = item.split('+')
+            i = item.split( '+' )
             pressList = []
-            if len(i)>1:
+            if len( i )>1:
                 for u in i:
-                    if u.startswith('Key.'):
-                        self.keyboardcontroller.press(eval(u))
-                        pressList.append(u)
+                    if u.startswith( 'Key.' ):
+                        self.keyboardcontroller.press( eval( u ))
+                        pressList.append( u )
                     else:
-                        self.keyboardcontroller.type(u)
+                        self.keyboardcontroller.type( u )
                 for key in pressList:
-                    self.keyboardcontroller.release(eval(key))
+                    self.keyboardcontroller.release( eval( key ))
             else:
                 i = i[0]
-                if i.startswith('Key.'):
-                    self.keyboardcontroller.press(eval(i))
-                    pressList.append(i)
+                if i.startswith( 'Key.' ):
+                    self.keyboardcontroller.press( eval( i ))
+                    pressList.append( i )
                 else:
-                    self.keyboardcontroller.type(i)
+                    self.keyboardcontroller.type( i )
                 for key in pressList:
-                    self.keyboardcontroller.release(eval(key))
+                    self.keyboardcontroller.release( eval( key ))
 
 
     def execute(self, executable, parameters):
-        if(parameters):
-            subprocess.call([executable] + shlex.split(parameters))
+        if( parameters ):
+            subprocess.call([ executable ] + shlex.split( parameters ))
         else:
-            subprocess.call([executable])
+            subprocess.call([ executable ])
 
     def pressXF86Symbol(self, symbol):
         self.execute('xdotool','key ' + symbol)

@@ -4,6 +4,10 @@
     "disable_capslock": true,
     "force_numlock": true,
     "keys":{
+        "KEY_TAB":{
+            "action":"paste",
+            "buffer":"one"
+        },
         "KEY_ESC":{
             "action":"reload"
         },

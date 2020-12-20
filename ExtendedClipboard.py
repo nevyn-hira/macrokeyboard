@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 
-from pynput.keyboard import Key, Controller as keyboardController
+# from pynput.keyboard import Key, Controller as keyboardController
 import pyperclip
-from pathlib import Path
+#from pathlib import Path
 
 class Clipboard:
     def __init__( self ):
         self.buffer = {}
 
-    def get( self, id ):
-        pyperclip.copy(self.buffer[id])
+    def get( self, buff_id ):
+        if buff_id in self.buffer:
+            pyperclip.copy(self.buffer[buff_id])
 
-    def put( self, id ):
-        self.buffer[id] = pyperclip.paste()
+    def put( self, buff_id ):
+        self.buffer[buff_id] = pyperclip.paste()
 
     def saveClipboard( self ):
         self.put('.clipboard')
@@ -20,15 +21,16 @@ class Clipboard:
     def restoreClipboard( self ):
         self.get('.clipboard')
 
-    def buffers(self):
-        print(self.buffer)
+    # def copy(self, id, data):
+    #     self._saveClipboard()
+    #     pyperclip.copy(data)
+    #     self._put(id)
+    #     self._restoreClipboard()
+
 
 if __name__ == "__main__":
     #test code...
     clipboard = Clipboard()
-    clipboard.saveClipboard()
-    pyperclip.copy('Boo!')
-    clipboard.restoreClipboard()
+    # clipboard.copy('test','This is the data that never ends')
+    print(clipboard.buffer)
     print(pyperclip.paste())
-
-    
