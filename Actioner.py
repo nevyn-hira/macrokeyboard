@@ -62,10 +62,9 @@ class Actioner:
             self.openAlt(actioninfo["mimelist"])
         elif action == "sendkeypress":
             current_window = Window.get_active().wm_class
-            print(current_window)
-            self.switchTo(actioninfo["classname"], '')
-            self.keySequence(actioninfo["keypress"])
-            self.switchTo(current_window, '')
+            if not self.switchTo(actioninfo["classname"], ''):
+                self.keySequence(actioninfo["keypress"])
+                self.switchTo(current_window, '')
 
     def openAlt(self, mimelist):
         self.keySequence('Key.ctrl+c')
@@ -74,7 +73,7 @@ class Actioner:
             fmimetype = magic.from_file(file, mime=True)
             if fmimetype in self.mimelists[mimelist]:
                 subprocess.call(['gtk-launch', 
-                    self.mimelists[ mimelist ][ fmimetype ], file])
+                    self.mimelists[mimelist][fmimetype], file])
             else:
                 print(fmimetype)
 
@@ -116,13 +115,12 @@ class Actioner:
         self.keySequence('Key.ctrl+Key.shift+u|'+str(code)+"|Key.enter")
 
     def switchTo(self, classname, command):
-        for window in Window.list():
-            if window.wm_class == classname:
-                window.activate()
-        if Window.get_active():
-            if Window.get_active().wm_class != classname:
-                if command != "":
-                    subprocess.Popen(command)
+        windows = Window.by_class(classname)
+        if len(windows) > 0:
+            windows[0].activate()
+        else:
+            if command != "":
+                subprocess.Popen(command)
                 return True
         return False
 
