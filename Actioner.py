@@ -8,26 +8,25 @@ from wmctrl import Window
 from pynotifier import Notification
 import pyperclip
 from ExtendedClipboard import Clipboard
-import time
 
 class Actioner:
-    def __init__( self ):
+    def __init__(self):
         self.keyboardcontroller = keyboardController()
         self.launchnotifications = False
         self.launchicon = os.path.dirname(os.path.realpath(__file__)) + '/launch.png'
         self.clipboard = Clipboard()
 
-    def populateMimeLists( self, mimelists ):
+    def populateMimeLists(self, mimelists):
         self.mimelists = mimelists
 
-    def setNotifications( self ):
+    def setNotifications(self):
         self.launchnotifications = True
 
-    def action( self, actioninfo ):
+    def action(self, actioninfo):
         action = actioninfo['action']
         if action == 'switchto':
-            if( self.switchTo( actioninfo['classname'], actioninfo['executable'] )):
-                if( self.launchnotifications ):
+            if(self.switchTo(actioninfo['classname'], actioninfo['executable'])):
+                if(self.launchnotifications):
                     try:
                         Notification(
                             title = 'Launching',
@@ -41,101 +40,94 @@ class Actioner:
 
         elif action == 'XF86Symbol':
             self.pressXF86Symbol(
-                actioninfo[ 'symbol' ])
+                actioninfo['symbol'])
         elif action == 'unicode':
             self.typeUnicodeSymbol(
-                actioninfo[ 'code' ])
+                actioninfo['code'])
         elif action == 'quit':
             sys.exit(0)
         elif action == 'type':
             self.type(
-                actioninfo[ 'content' ])
+                actioninfo['content'])
         elif action == 'run':
             self.execute(
-                actioninfo[ 'executable' ],
-                actioninfo[ 'parameters' ] if 'parameters' in actioninfo else [])
+                actioninfo['executable'],
+                actioninfo['parameters'] if 'parameters' in actioninfo else [])
         elif action == "gotolocation":
-            self.gotoLocation( actioninfo['location'] )
+            self.gotoLocation(actioninfo['location'])
         elif action == "keysequence":
-            self.keySequence( actioninfo['sequence'] )
-            return( action )
+            self.keySequence(actioninfo['sequence'])
+            return(action)
         elif action == "altopen":
-            self.openAlt( actioninfo["mimelist"] )
-# Attempts for a copy/paste buffer. Not currently working.
-        # elif action == "copy":
-        #     self.clipboard.saveClipboard()
-        #     self.keySequence( "Key.ctrl+c" )
-        #     self.clipboard.put( actioninfo['buffer'] )
-        #     self.clipboard.restoreClipboard()
-        #     print(self.clipboard.buffer)
-        # elif action == "paste":
-        #     self.clipboard.saveClipboard()
-        #     self.clipboard.get( actioninfo['buffer'] )
-        #     self.keySequence( "Key.ctrl+v" )
-        #     self.clipboard.restoreClipboard()
-        #     print(self.clipboard.buffer)
+            self.openAlt(actioninfo["mimelist"])
+        elif action == "sendkeypress":
+            current_window = Window.get_active().wm_class
+            print(current_window)
+            self.switchTo(actioninfo["classname"], '')
+            self.keySequence(actioninfo["keypress"])
+            self.switchTo(current_window, '')
 
     def openAlt(self, mimelist):
-        list = self.mimelists[mimelist]
         self.keySequence('Key.ctrl+c')
         files = pyperclip.paste().split("\n")
         for file in files:
-            fmimetype = magic.from_file( file, mime=True )
+            fmimetype = magic.from_file(file, mime=True)
             if fmimetype in self.mimelists[mimelist]:
-                subprocess.call( ['gtk-launch', 
-                    self.mimelists[ mimelist ][ fmimetype ], file] )
+                subprocess.call(['gtk-launch', 
+                    self.mimelists[ mimelist ][ fmimetype ], file])
             else:
                 print(fmimetype)
 
     def keySequence(self, sequence):
-        items = sequence.split( '|' )
+        items = sequence.split('|')
         for item in items:
-            i = item.split( '+' )
+            i = item.split('+')
             pressList = []
-            if len( i )>1:
+            if len(i) > 1:
                 for u in i:
-                    if u.startswith( 'Key.' ):
-                        self.keyboardcontroller.press( eval( u ))
-                        pressList.append( u )
+                    if u.startswith('Key.'):
+                        self.keyboardcontroller.press(eval(u))
+                        pressList.append(u)
                     else:
-                        self.keyboardcontroller.type( u )
+                        self.keyboardcontroller.type(u)
                 for key in pressList:
-                    self.keyboardcontroller.release( eval( key ))
+                    self.keyboardcontroller.release(eval(key))
             else:
                 i = i[0]
-                if i.startswith( 'Key.' ):
-                    self.keyboardcontroller.press( eval( i ))
-                    pressList.append( i )
+                if i.startswith('Key.'):
+                    self.keyboardcontroller.press(eval(i))
+                    pressList.append(i)
                 else:
-                    self.keyboardcontroller.type( i )
+                    self.keyboardcontroller.type(i)
                 for key in pressList:
-                    self.keyboardcontroller.release( eval( key ))
+                    self.keyboardcontroller.release(eval(key))
 
 
     def execute(self, executable, parameters):
-        if( parameters ):
-            subprocess.call([ executable ] + shlex.split( parameters ))
+        if(parameters):
+            subprocess.call([executable] + shlex.split(parameters))
         else:
-            subprocess.call([ executable ])
+            subprocess.call([executable])
 
     def pressXF86Symbol(self, symbol):
         self.execute('xdotool','key ' + symbol)
 
-    def typeUnicodeSymbol( self, code ):
+    def typeUnicodeSymbol(self, code):
         self.keySequence('Key.ctrl+Key.shift+u|'+str(code)+"|Key.enter")
 
-    def switchTo( self, classname, command ):
+    def switchTo(self, classname, command):
         for window in Window.list():
-            if( window.wm_class == classname ):
+            if window.wm_class == classname:
                 window.activate()
-        if (Window.get_active()):
-            if( Window.get_active().wm_class != classname ):
-                subprocess.Popen( command )
+        if Window.get_active():
+            if Window.get_active().wm_class != classname:
+                if command != "":
+                    subprocess.Popen(command)
                 return True
         return False
 
-    def type( self, content ):
+    def type(self, content):
         self.keyboardcontroller.type(str(content))
 
-    def gotoLocation( self, location ):
+    def gotoLocation(self, location):
         self.keySequence('Key.ctrl+l|'+location+'|Key.enter')

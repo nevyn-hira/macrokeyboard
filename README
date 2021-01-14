@@ -206,6 +206,26 @@ Run a script/executable
 }
 ```
 
+#### sendkeypress
+
+Send a keypress to a particular window. Quickly switches to the requested window, sends keypress and then switches back.
+
+##### Parameters:
+
+**classname** - classname of the window to send a keypress to.
+
+**keypress**  - The keypress to send to the window,
+
+###### Example ######
+
+```
+{
+    "action":"sendkeypress",
+    "classname":"Navigator.Firefox",
+    "keypress":"Key.f11"
+}
+```
+
 #### switchto:
 
 Switch to an application.
