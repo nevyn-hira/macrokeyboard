@@ -115,7 +115,11 @@ class Actioner:
         self.keySequence('Key.ctrl+Key.shift+u|'+str(code)+"|Key.enter")
 
     def switchTo(self, classname, command):
-        windows = Window.by_class(classname)
+        windows = ''
+        try:
+            windows = Window.by_class(classname)
+        except ValueError:
+            print(Window.list())
         if len(windows) > 0:
             windows[0].activate()
         else:

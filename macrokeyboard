@@ -144,9 +144,7 @@ def main(argv):
     configFile = os.path.join(os.path.expanduser('~'), '.macrokeyboard.json')
     VERBOSE = False
     try:
-        print(argv)
         opts, _ = getopt.getopt(argv, "hvc:", ["help,verbose,config="])
-        print(opts)
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
