@@ -62,7 +62,6 @@ class KeyLocks:
             
     def checkStates(self):
         out = self.getXSetOutput()
-        print(self.IsCaps(out))
         if self.disablecaps and self.IsCaps(out):
             self.__ToggleCapsLock()
         if self.ForceNum and not self.IsNum(out):
