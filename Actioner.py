@@ -43,8 +43,6 @@ class Actioner:
         elif action == 'unicode':
             self.typeUnicodeSymbol(
                 actioninfo['code'])
-        # elif action == 'quit':
-        #     sys.exit(0)
         elif action == 'type':
             self.type(
                 actioninfo['content'])
