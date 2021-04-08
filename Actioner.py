@@ -7,14 +7,12 @@ import os
 from wmctrl import Window
 from pynotifier import Notification
 import pyperclip
-from ExtendedClipboard import Clipboard
 
 class Actioner:
     def __init__(self):
         self.keyboardcontroller = keyboardController()
         self.launchnotifications = False
         self.launchicon = os.path.dirname(os.path.realpath(__file__)) + '/launch.png'
-        self.clipboard = Clipboard()
 
     def populateMimeLists(self, mimelists):
         self.mimelists = mimelists
