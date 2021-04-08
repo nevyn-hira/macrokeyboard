@@ -175,7 +175,7 @@ Executes an action on key down AND another action on key up allowing for hold co
         "action": "XF86Symbol",
         "symbol": "XF86AudioMute"
 }
-
+```
 
 #### keysequence:
 Type a sequence of keys.
