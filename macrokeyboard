@@ -3,13 +3,17 @@
 
 import evdev
 import os
-import json
 import sys
 import getopt
 from wmctrl import Window
 from Actioner import Actioner
-from modifierkeys import Modifierkeys
+# from modifierkeys import Modifierkeys
 import notify2 as notify
+from configuration import Configuration
+
+import gi
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
 
 def print_help():
     helptext="""\
@@ -23,39 +27,6 @@ Configuration file is in json format and needs to have device defined.
                     macro keyboards.
 /"""
     print("\n\n"+helptext+"\n\n")
-
-class Configuration:
-    def __init__( self, configFile ):
-        self.config_file = configFile
-        self.config = []
-        self.readConfiguration()
-        self.keyIndex = {}
-
-        for ikey in self.config['keys']:
-            keys = ikey.split('+',1)
-            if keys[0] not in self.keyIndex:
-                self.keyIndex[keys[0]] = []
-            self.keyIndex[keys[0]].append(self.config['keys'][ikey])
-            if len(keys) > 1:
-                self.keyIndex[keys[0]][len(self.keyIndex[keys[0]]) -1 ]["modifiers"] = keys[1]
-
-    def find( self, key ):
-        if key in self.keyIndex:
-            return self.keyIndex[key]
-        else:
-            return False
-
-    def readConfiguration( self ):
-        if not os.path.exists(self.config_file):
-            sys.exit('Configuration file not found.')
-            sys.exit(1)
-        with open(self.config_file) as json_file:
-            self.config = json.load(json_file)
-        if( not 'device' in self.config ):
-            sys.exit('No device defined.')
-        else:
-            self.device = self.config['device']
-            self.modifierkeys = Modifierkeys( self.config['modifier_keys'] )
 
 class Controller:
     def __init__( self, configfile ):
@@ -113,8 +84,7 @@ class Controller:
                     try:
                         active_window = Window.get_active()
                     except:
-                        # pass
-                        print("fuck")
+                        pass
                     if VERBOSE:
                         print( 'Keycode: ' + key.keycode )
                         try:
@@ -138,7 +108,6 @@ class Controller:
                                 if action_info == "" and noMod != "":
                                     action_info = noMod
                                 if "context_class" in action_info:
-                                    print(active_window.wm_class)
                                     if active_window.wm_class in action_info["context_class"]:
                                         action_info = action_info["context_class"][active_window.wm_class]
                                 if "context_role" in action_info:
@@ -151,7 +120,6 @@ class Controller:
                                 elif action_info['action'] == 'exit':
                                     sys.exit(0)
                                 else:
-                                    print(action_info)
                                     self.actioner.action(action_info)
                         elif VERBOSE:
                             print("Modifier pressed")
@@ -193,3 +161,5 @@ def main(argv):
 
 if __name__ == "__main__":
     main([]) if len( sys.argv ) == 0 else main( sys.argv[ 1: ])
+    # gdkkeymap = Gdk.Keymap.get_default()
+    # print(gdkkeymap.get_num_lock_state())
