@@ -37,15 +37,14 @@ class Actioner:
                         ).send()
                     except:
                         pass
-
         elif action == 'XF86Symbol':
             self.pressXF86Symbol(
                 actioninfo['symbol'])
         elif action == 'unicode':
             self.typeUnicodeSymbol(
                 actioninfo['code'])
-        elif action == 'quit':
-            sys.exit(0)
+        # elif action == 'quit':
+        #     sys.exit(0)
         elif action == 'type':
             self.type(
                 actioninfo['content'])
@@ -63,8 +62,15 @@ class Actioner:
         elif action == "sendkeypress":
             current_window = Window.get_active().wm_class
             if not self.switchTo(actioninfo["classname"], ''):
+                
                 self.keySequence(actioninfo["keypress"])
                 self.switchTo(current_window, '')
+        elif action =="holdandrelease":
+            if "state" in actioninfo:
+                if actioninfo["state"] == "hold":
+                    self.action( actioninfo["onhold"] )
+                elif actioninfo["state"] == "release":
+                    self.action( actioninfo["onrelease"] )
 
     def openAlt(self, mimelist):
         self.keySequence('Key.ctrl+c')
