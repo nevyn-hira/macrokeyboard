@@ -60,60 +60,60 @@ class Controller:
                 self.actioner.setNotifications()
         while True:
             for event in self.rawkeyboard.read_loop():
-                keyLocks.checkStates()
-                # if DISABLECAPS:
-                #     if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
-                #         self.__toggleCapsLock()
-                # if FORCENUM:
-                #     if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
-                #         self.__toggleNumLock()
                 if event.type == evdev.ecodes.EV_KEY:
+                    keyLocks.checkStates()
                     key = evdev.categorize(event)
-                    try:
-                        active_window = Window.get_active()
-                    except:
-                        pass
-                    if VERBOSE:
-                        print( 'Keycode: ' + key.keycode )
+                    if key.keystate == key.key_down or key.keystate == key.key_up:
                         try:
-                            print( '  wm_class:       ' + active_window.wm_class )
-                            print( '  wm_window_role: ' + active_window.wm_window_role )
+                            active_window = Window.get_active()
                         except:
                             pass
-                    if( key.keystate == key.key_down ):
-                        if not self.modifierkeys.keydown( key.keycode ):
-                            action_info = ""
-                            keyconfigs = self.config.find(key.keycode)
-                            if keyconfigs:
-                                noMod = ""
-                                for i, config in enumerate(keyconfigs):
-                                    if "modifiers" in config:
-                                        if self.modifierkeys.checkmodifiers(config["modifiers"].split('+')):
-                                            action_info = keyconfigs[i]
-                                    else:
-                                        noMod = keyconfigs[i]
-                                if action_info == "" and noMod != "":
-                                    action_info = noMod
-                                if "context_class" in action_info:
-                                    if active_window.wm_class in action_info["context_class"]:
-                                        action_info = action_info["context_class"][active_window.wm_class]
-                                if "context_role" in action_info:
-                                    if active_window.wm_window_role in action_info["context_role"]:
-                                        action_info = action_info["context_role"][active_window.wm_window_role]
-                            if 'action' in action_info:
-                                if action_info['action'] == 'reload':
-                                    self.config.readConfiguration()
-                                    self.actioner.populateMimeLists(self.config.config['mimetypelists'])
-                                elif action_info['action'] == 'exit':
-                                    sys.exit(0)
-                                else:
-                                    self.actioner.action(action_info)
-                        elif VERBOSE:
-                            print("Modifier pressed")
-                    elif( key.keystate == key.key_up ):
-                        self.modifierkeys.keyup( key.keycode )
+                        if VERBOSE:
+                            print( 'Keycode: ' + key.keycode )
+                            try:
+                                print( '  wm_class:       ' + active_window.wm_class )
+                                print( '  wm_window_role: ' + active_window.wm_window_role )
+                            except:
+                                pass
 
-# MAIN
+                        action_info = ""
+                        keyconfigs = self.config.find(key.keycode)
+                        if keyconfigs:
+                            noMod = ""
+                            for i, config in enumerate(keyconfigs):
+                                if "modifiers" in config:
+                                    if self.modifierkeys.checkmodifiers(config["modifiers"].split('+')):
+                                        action_info = keyconfigs[i]
+                                else:
+                                    noMod = keyconfigs[i]
+                            if action_info == "" and noMod != "":
+                                action_info = noMod
+                            if "context_class" in action_info:
+                                if active_window.wm_class in action_info["context_class"]:
+                                    action_info = action_info["context_class"][active_window.wm_class]
+                            if "context_role" in action_info:
+                                if active_window.wm_window_role in action_info["context_role"]:
+                                    action_info = action_info["context_role"][active_window.wm_window_role]
+                        if( key.keystate == key.key_down ):
+                            if not self.modifierkeys.keydown( key.keycode ):
+                                if 'action' in action_info:
+                                    if action_info['action'] == 'reload':
+                                        self.config.readConfiguration()
+                                        self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+                                    elif action_info['action'] == 'exit':
+                                        sys.exit(0)
+                                    else:
+                                        if action_info['action'] == 'holdandrelease':
+                                            action_info = action_info["onhold"]
+                                        self.actioner.action(action_info)
+                            elif VERBOSE:
+                                print("Modifier pressed")
+                        else:
+                            if action_info["action"] == "holdandrelease":
+                                action_info = action_info["onrelease"]
+                                self.actioner.action(action_info)
+                            self.modifierkeys.keyup( key.keycode )
+
 def main(argv):
     # Commandline parameters
     notify.init("MacroKeyboard")
