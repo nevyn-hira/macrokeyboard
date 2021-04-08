@@ -7,13 +7,10 @@ import sys
 import getopt
 from wmctrl import Window
 from Actioner import Actioner
-# from modifierkeys import Modifierkeys
+from modifierkeys import Modifierkeys
 import notify2 as notify
 from configuration import Configuration
-
-import gi
-gi.require_version('Gdk', '3.0')
-from gi.repository import Gdk
+from keyLocks import KeyLocks
 
 def print_help():
     helptext="""\
@@ -47,38 +44,29 @@ class Controller:
         else:
             sys.exit('No read access to input device')
 
-    def __toggleNumLock( self ):
-        self.actioner.execute('xdotool','key Num_Lock')
-
-    def __toggleCapsLock( self ):
-        self.actioner.execute('xdotool','key Caps_Lock')
-
     def loop(self, VERBOSE):
         self.initDevice()
-        DISABLECAPS = False
-        FORCENUM = False
+
+        keyLocks = KeyLocks()    
         if "disable_capslock" in self.config.config:
             if self.config.config["disable_capslock"]:
-                DISABLECAPS = True
-                if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
-                    self.__toggleCapsLock()
+                keyLocks.DisableCaps()
         if "force_numlock" in self.config.config:
             if self.config.config["force_numlock"]:
-                FORCENUM = True
-                if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
-                    self.__toggleNumLock()
+                keyLocks.ForceNum()
+
         if "launch-notify" in self.config.config:
             if self.config.config["launch-notify"]:
                 self.actioner.setNotifications()
         while True:
             for event in self.rawkeyboard.read_loop():
-                if DISABLECAPS:
-                    if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
-                        self.__toggleCapsLock()
-                if FORCENUM:
-                    if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
-                        self.__toggleNumLock()
-
+                keyLocks.checkStates()
+                # if DISABLECAPS:
+                #     if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
+                #         self.__toggleCapsLock()
+                # if FORCENUM:
+                #     if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
+                #         self.__toggleNumLock()
                 if event.type == evdev.ecodes.EV_KEY:
                     key = evdev.categorize(event)
                     try:
@@ -94,7 +82,6 @@ class Controller:
                             pass
                     if( key.keystate == key.key_down ):
                         if not self.modifierkeys.keydown( key.keycode ):
-                            # action = False
                             action_info = ""
                             keyconfigs = self.config.find(key.keycode)
                             if keyconfigs:
@@ -146,7 +133,6 @@ def main(argv):
         elif opt in [ "-c", "--config" ]:
             configFile = arg
 
-    # config = Configuration( configFile )
     controller = Controller(configFile)
     while True:
         try:
@@ -161,5 +147,3 @@ def main(argv):
 
 if __name__ == "__main__":
     main([]) if len( sys.argv ) == 0 else main( sys.argv[ 1: ])
-    # gdkkeymap = Gdk.Keymap.get_default()
-    # print(gdkkeymap.get_num_lock_state())
