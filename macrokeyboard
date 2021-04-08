@@ -17,9 +17,9 @@ Usage:
   macrokeyboard -v -c <config_file>
 
 Configuration file is in json format and needs to have device defined.
--v  :               Verbose. Use this mode if you want to see the key codes and 
+-v  :               Verbose. Use this mode if you want to see the key codes and
                     the window classes (great for when writing a config file)
--c <config_file> :  Use config file. Particularly useful when you want multiple 
+-c <config_file> :  Use config file. Particularly useful when you want multiple
                     macro keyboards.
 /"""
     print("\n\n"+helptext+"\n\n")
@@ -29,6 +29,21 @@ class Configuration:
         self.config_file = configFile
         self.config = []
         self.readConfiguration()
+        self.keyIndex = {}
+
+        for ikey in self.config['keys']:
+            keys = ikey.split('+',1)
+            if keys[0] not in self.keyIndex:
+                self.keyIndex[keys[0]] = []
+            self.keyIndex[keys[0]].append(self.config['keys'][ikey])
+            if len(keys) > 1:
+                self.keyIndex[keys[0]][len(self.keyIndex[keys[0]]) -1 ]["modifiers"] = keys[1]
+
+    def find( self, key ):
+        if key in self.keyIndex:
+            return self.keyIndex[key]
+        else:
+            return False
 
     def readConfiguration( self ):
         if not os.path.exists(self.config_file):
@@ -61,6 +76,12 @@ class Controller:
         else:
             sys.exit('No read access to input device')
 
+    def __toggleNumLock( self ):
+        self.actioner.execute('xdotool','key Num_Lock')
+
+    def __toggleCapsLock( self ):
+        self.actioner.execute('xdotool','key Caps_Lock')
+
     def loop(self, VERBOSE):
         self.initDevice()
         DISABLECAPS = False
@@ -69,12 +90,12 @@ class Controller:
             if self.config.config["disable_capslock"]:
                 DISABLECAPS = True
                 if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
-                    self.actioner.execute('xdotool','key Caps_Lock')
+                    self.__toggleCapsLock()
         if "force_numlock" in self.config.config:
             if self.config.config["force_numlock"]:
                 FORCENUM = True
                 if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
-                    self.actioner.execute('xdotool','key Num_Lock')
+                    self.__toggleNumLock()
         if "launch-notify" in self.config.config:
             if self.config.config["launch-notify"]:
                 self.actioner.setNotifications()
@@ -82,16 +103,18 @@ class Controller:
             for event in self.rawkeyboard.read_loop():
                 if DISABLECAPS:
                     if evdev.ecodes.LED_CAPSL in self.rawkeyboard.leds():
-                        self.actioner.execute('xdotool','key Caps_Lock')
+                        self.__toggleCapsLock()
                 if FORCENUM:
                     if not evdev.ecodes.LED_NUML in self.rawkeyboard.leds():
-                        self.actioner.execute('xdotool','key Num_Lock')
+                        self.__toggleNumLock()
+
                 if event.type == evdev.ecodes.EV_KEY:
                     key = evdev.categorize(event)
                     try:
                         active_window = Window.get_active()
                     except:
-                        pass
+                        # pass
+                        print("fuck")
                     if VERBOSE:
                         print( 'Keycode: ' + key.keycode )
                         try:
@@ -101,37 +124,35 @@ class Controller:
                             pass
                     if( key.keystate == key.key_down ):
                         if not self.modifierkeys.keydown( key.keycode ):
-                            for ikey in self.config.config['keys']:
-                                action = False
-                                keys = ikey.split('+',1)
-                                if key.keycode == keys[0]:
-                                    if len(keys) == 1:
-                                        if not self.modifierkeys.isModifiers():
-                                            if "context_role" in self.config.config['keys'][ikey]:
-                                                if active_window.wm_window_role in self.config.config['keys'][ikey]['context_role']:
-                                                    action = True
-                                                    action_info = self.config.config['keys'][ikey]['context_role'][active_window.wm_window_role]
-                                            if not action and "context_class" in self.config.config['keys'][ikey]:
-                                                if active_window.wm_class in self.config.config['keys'][ikey]['context_class']:
-                                                    action = True
-                                                    action_info = self.config.config['keys'][ikey]['context_class'][active_window.wm_class]
-                                            if not action:
-                                                action_info = self.config.config['keys'][ikey]
-                                                action = True
+                            # action = False
+                            action_info = ""
+                            keyconfigs = self.config.find(key.keycode)
+                            if keyconfigs:
+                                noMod = ""
+                                for i, config in enumerate(keyconfigs):
+                                    if "modifiers" in config:
+                                        if self.modifierkeys.checkmodifiers(config["modifiers"].split('+')):
+                                            action_info = keyconfigs[i]
                                     else:
-                                        if self.modifierkeys.checkmodifiers(keys[1].split('+')):
-                                            action_info = self.config.config['keys'][ikey]
-                                            action = True
-                                    if action:
-                                        if 'action' in action_info:
-                                            if action_info['action'] == 'reload':
-                                                self.config.readConfiguration()
-                                                self.actioner.populateMimeLists(self.config.config['mimetypelists'])
-                                            elif action_info['action'] == 'exit':
-                                                sys.exit(0)
-                                            else:
-                                                self.actioner.action(action_info)
-                                    action = False            
+                                        noMod = keyconfigs[i]
+                                if action_info == "" and noMod != "":
+                                    action_info = noMod
+                                if "context_class" in action_info:
+                                    print(active_window.wm_class)
+                                    if active_window.wm_class in action_info["context_class"]:
+                                        action_info = action_info["context_class"][active_window.wm_class]
+                                if "context_role" in action_info:
+                                    if active_window.wm_window_role in action_info["context_role"]:
+                                        action_info = action_info["context_role"][active_window.wm_window_role]
+                            if 'action' in action_info:
+                                if action_info['action'] == 'reload':
+                                    self.config.readConfiguration()
+                                    self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+                                elif action_info['action'] == 'exit':
+                                    sys.exit(0)
+                                else:
+                                    print(action_info)
+                                    self.actioner.action(action_info)
                         elif VERBOSE:
                             print("Modifier pressed")
                     elif( key.keystate == key.key_up ):
@@ -157,6 +178,7 @@ def main(argv):
         elif opt in [ "-c", "--config" ]:
             configFile = arg
 
+    # config = Configuration( configFile )
     controller = Controller(configFile)
     while True:
         try:
