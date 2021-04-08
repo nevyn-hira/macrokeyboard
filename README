@@ -126,6 +126,20 @@ Macros may be assigned to the context of programs. The "context" is either the w
 
 ### Action defines what happens:
 
+#### exit:
+Exit macrokeyboard. Great if you want to quit macrokeyboard so that you can rerun it in a terminal in verbose mode for configuration.
+
+##### Parameters:
+
+**NONE**
+
+##### Example:
+```
+{
+    "action":"exit"
+}
+```
+
 #### gotolocation
 
 Primarily meant for use with GtkFileChooserDialog when using context_role. Quickly goes to a defined location. It's just a series of keypresses (Ctrl+L, type location, press enter).
@@ -141,6 +155,28 @@ Primarily meant for use with GtkFileChooserDialog when using context_role. Quick
 }
 ```
 
+#### holdandrelease
+
+Executes an action on key down AND another action on key up allowing for hold commands.
+
+##### Parameters:
+** onhold **    - What to do when pressed down.
+
+** onrelease ** - What to do on release.
+
+##### Example:
+```
+"action":"holdandrelease",
+    "onhold":{
+        "action": "XF86Symbol",
+        "symbol": "XF86AudioMute"
+    },
+    "onrelease":{
+        "action": "XF86Symbol",
+        "symbol": "XF86AudioMute"
+}
+
+
 #### keysequence:
 Type a sequence of keys.
 
@@ -155,20 +191,6 @@ Type a sequence of keys.
 }
 ```
 This will do the same thing as "gotolocation"
-
-#### exit:
-Exit macrokeyboard. Great if you want to quit macrokeyboard so that you can rerun it in a terminal in verbose mode for configuration.
-
-##### Parameters:
-
-**NONE**
-
-##### Example:
-```
-{
-    "action":"exit"
-}
-```
 
 #### reload:
 
