@@ -6,7 +6,6 @@ from modifierkeys import Modifierkeys
 class Configuration:
     def __init__( self, configFile ):
         self.config_file = configFile
-        self.config = []
         self.readConfiguration()
         self.keyIndex = {}
 
@@ -25,6 +24,7 @@ class Configuration:
             return False
 
     def readConfiguration( self ):
+        self.config = []
         if not os.path.exists(self.config_file):
             sys.exit('Configuration file not found.')
             sys.exit(1)
