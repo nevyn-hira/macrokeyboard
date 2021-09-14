@@ -43,7 +43,16 @@ You can assign keys to be:
 ## What do you need?:
 * Permissions. You need to set an input device for the keyboard to read access. You should, by default, use an entry in /dev/input/by-id as this is more consistent but means you have to follow the link back to set the permissions. Add the intended user to the input group (on Ubuntu. Not tested on other distros).
 * xdotool
-* pynput
+* libnotify-bin
+* Python libraries
+    * pynput
+    * python-magic
+    * py-notifyer
+    * pyperclip
+    * evdev
+### Installation of Dependencies on Ubuntu
+sudo apt-get install xdotool libnotify-bin pip3
+pip3 install pynput python-magic py-notifier pyperclip evdev
 
 ## Configuration:
 Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined (but doesn't allow for comments. It should be trivial to go and strip out comments before doing anything on it...). You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
@@ -326,3 +335,7 @@ Invoke a XF86Symbol (think media keys)
 }
 
 ```
+
+## Issues
+### Current Bugs
+* Reload functionality not working
