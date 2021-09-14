@@ -3,10 +3,38 @@
     "modifier_keys":"KEY_LEFTSHIFT,KEY_LEFTCTRL,KEY_KPENTER",
     "disable_capslock": true,
     "force_numlock": true,
+    "launch-notify": true,
+    "mimetypelists":{
+        "list1":{
+            "image/png":"gimp",
+            "image/svg+xml":"inkscape",
+            "image/jpeg":"gimp",
+            "text/plain":"pluma",
+            "text/x-python":"pluma",
+            "text/css":"pluma",
+            "text/csv":"pluma",
+            "text/html":"pluma",
+            "application/php":"pluma",
+            "text/xml":"pluma",
+            "image/x-xcf":"gimp"
+        }
+    },
     "keys":{
-        "KEY_TAB":{
-            "action":"paste",
-            "buffer":"one"
+        "KEY_SPACE":{
+            "action":"holdandrelease",
+            "onhold":{
+                "action": "XF86Symbol",
+                "symbol": "XF86AudioMute"
+            },
+            "onrelease":{
+                "action": "XF86Symbol",
+                "symbol": "XF86AudioMute"
+            }
+        },
+        "KEY_A":{
+            "action":"sendkeypress",
+            "classname":"Navigator.Firefox",
+            "keypress":"Key.f11"
         },
         "KEY_ESC":{
             "action":"reload"
