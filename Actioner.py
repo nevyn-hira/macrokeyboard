@@ -22,7 +22,11 @@ class Actioner:
 
     def action(self, actioninfo):
         action = actioninfo['action']
-        if action == 'switchto':
+        if action == 'chain':
+            if "chain" in action:
+                for a in sorted(actioninfo['chain']):
+                    self.action( actioninfo['chain'][a] )
+        elif action == 'switchto':
             if(self.switchTo(actioninfo['classname'], actioninfo['executable'])):
                 if(self.launchnotifications):
                     try:
@@ -54,11 +58,11 @@ class Actioner:
             self.keySequence(actioninfo['sequence'])
             return(action)
         elif action == "altopen":
-            self.openAlt(actioninfo["mimelist"])
+            if "mimelist" in actioninfo:
+                self.openAlt(actioninfo["mimelist"])
         elif action == "sendkeypress":
             current_window = Window.get_active().wm_class
             if not self.switchTo(actioninfo["classname"], ''):
-                
                 self.keySequence(actioninfo["keypress"])
                 self.switchTo(current_window, '')
         elif action =="holdandrelease":
