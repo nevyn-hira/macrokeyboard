@@ -73,7 +73,7 @@
             },
             "action": "run",
             "executable": "mate-screenshot",
-            "parameters": "-a"
+            "parameters": "-ai"
         },
         "KEY_1+KEY_LEFTSHIFT+KEY_LEFTCTRL":{
             "action": "XF86Symbol",
