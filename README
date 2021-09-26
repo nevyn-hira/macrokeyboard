@@ -1,0 +1,341 @@
+# License
+
+Copyright 2019 Nilesh "Nevyn" Hira
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Author: Nevyn Hira (nevynh@gmail.com)
+
+# Macrokeyboard Script
+
+This is a python script for turning old, otherwise dust collecting keyboards, into macrokeyboards.
+
+## What can it do?
+
+You can assign keys to be:
+
+* Modifiers. The same sort of functionality as Shift, Alt and Control except that you can pick any arbitary key to be a modifier key.
+
+* Unicode. Assign a key to a unicode character (or to several characters with the use of modifier keys).
+
+* Switch to an application. If the application can be found, it will switch to it. Otherwise it will run the application for you. Great for development work where you're constantly switching between the same 3 or 4 windows.
+
+* Context aware actions: You can configure it to be aware of the application/dialogue you're in and do an action based on this.
+
+* Perform "macros" i.e. enter in a sequence of key presses.
+
+* Execute a command.
+
+## What it should do in the future:
+* Create a simple copy and paste function for text. Say you're using the same 5 variable names in code... it'd be useful to just be able to assign those names to a key.
+
+## What do you need?:
+* Permissions. You need to set an input device for the keyboard to read access. You should, by default, use an entry in /dev/input/by-id as this is more consistent but means you have to follow the link back to set the permissions. Add the intended user to the input group (on Ubuntu. Not tested on other distros).
+* xdotool
+* libnotify-bin
+* Python libraries
+    * pynput
+    * python-magic
+    * py-notifyer
+    * pyperclip
+    * evdev
+### Installation of Dependencies on Ubuntu
+sudo apt-get install xdotool libnotify-bin pip3
+pip3 install pynput python-magic py-notifier pyperclip evdev
+
+## Configuration:
+Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined (but doesn't allow for comments. It should be trivial to go and strip out comments before doing anything on it...). You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
+
+In the root, device MUST be defined i.e.
+
+```
+{
+    "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name"
+}
+```
+
+Modifier keys are defined as comma separated string. i.e.
+
+```
+
+{
+
+    "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+
+    "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT"
+
+}
+
+```
+
+You can decide whether you want to disable the caps lock key:
+```
+{
+
+    "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+
+    "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT",
+
+    "disable_capslock":true
+
+}
+```
+
+The keys section allows you to define your keys:
+```
+
+{
+    "device":"/dev/input/by-id/usb-WHATEVER_Keyboard_name",
+    "modifier_keys":"KEY_LEFTSHIFT,KEY_RIGHTSHIFT",
+    "keys":{
+        "KEY_1+KEY_LEFTSHIFT":{
+            "action": "type"
+        }
+    }
+}
+
+```
+
+The section name in keys refers to the key(s) needed to invoke an action. The key HAS to go first, modifiers after it. This list is a + separated string.
+
+Macros may be assigned to the context of programs. The "context" is either the wm_window_role OR the wm_class name. This can be found by running macrokeyboard with the --verbose switch, making the desired application active and pressing a key on the macrokeyboard. wm_window_role takes precedence.
+
+```
+...
+{
+    "keys":{
+        "KEY_1":{
+            "context_role":{
+                "GtkFileChooserDialog":{
+                    "action":"gotolocation",
+                    "location":"~/Pictures"
+                }
+            }
+            "context_class":{
+                "Navigator.Firefox":{
+                    "action":"type",
+                    "content":"I will only do this if 1 is pressed when firefox is active"
+                }
+            }
+        }
+    }
+}
+```
+
+### Action defines what happens:
+
+#### exit:
+Exit macrokeyboard. Great if you want to quit macrokeyboard so that you can rerun it in a terminal in verbose mode for configuration.
+
+##### Parameters:
+
+**NONE**
+
+##### Example:
+```
+{
+    "action":"exit"
+}
+```
+
+#### gotolocation
+
+Primarily meant for use with GtkFileChooserDialog when using context_role. Quickly goes to a defined location. It's just a series of keypresses (Ctrl+L, type location, press enter).
+
+##### Parameters:
+** location ** - The location to go to.
+
+##### Example:
+```
+{
+    "action":"gotolocation",
+    "location":"~/Pictures"
+}
+```
+
+#### holdandrelease
+
+Executes an action on key down AND another action on key up allowing for hold commands.
+
+##### Parameters:
+** onhold **    - What to do when pressed down.
+
+** onrelease ** - What to do on release.
+
+##### Example:
+```
+"action":"holdandrelease",
+    "onhold":{
+        "action": "XF86Symbol",
+        "symbol": "XF86AudioMute"
+    },
+    "onrelease":{
+        "action": "XF86Symbol",
+        "symbol": "XF86AudioMute"
+}
+```
+
+#### keysequence:
+Type a sequence of keys.
+
+#### Parameters:
+** sequence ** - the sequence of keys to type. These need to be pipe separated. Keys that need to pressed in conjunction with other keys can be linked together with a + symbol. Special keys can be defined using key.[Key] where [Key] is defined here: https://github.com/moses-palmer/pynput/blob/master/lib/pynput/keyboard/_xorg.py. Search for class Key.
+
+##### Example:
+```
+{
+    "action":"keysequence",
+    "sequence":"Key.ctrl+l|~/Pictures|Key.enter"
+}
+```
+This will do the same thing as "gotolocation"
+
+#### reload:
+
+Reload the configuration. Will only take effect on modifiers and keys (but have no effect on the device used unless a OSError exception is raised).
+
+##### Parameters:
+
+**NONE**
+
+##### Example:
+```
+{
+    "action":"reload"
+}
+```
+
+#### run:
+
+Run a script/executable
+
+##### Parameters:
+
+**executable** -    The file to run.
+
+**parameters** -    Optional. String separated parameters.
+
+##### Example #####
+
+```
+{
+    "action":"run",
+    "executable":"notify-send"
+    "parameters":"'This is a Heading' 'This is my message body'"
+
+}
+```
+
+#### sendkeypress
+
+Send a keypress to a particular window. Quickly switches to the requested window, sends keypress and then switches back.
+
+##### Parameters:
+
+**classname** - classname of the window to send a keypress to.
+
+**keypress**  - The keypress to send to the window,
+
+###### Example ######
+
+```
+{
+    "action":"sendkeypress",
+    "classname":"Navigator.Firefox",
+    "keypress":"Key.f11"
+}
+```
+
+#### switchto:
+
+Switch to an application.
+
+##### Parameters:
+
+**classname** - class of the application as it appears in wmctrl
+
+**executable** - Optional. Application to run if window not found.
+
+##### Example:
+
+```
+
+{
+    "action":"switchto",
+    "classname":"gnome-calculator.Gnome-calculator",
+    "executable":"gnome-calculator"
+}
+
+```
+
+#### type:
+
+Type a string.
+
+##### Parameters:
+
+**content** - the string to type. Will not handle unicode characters (known limitation).
+
+##### Example:
+
+```
+
+{
+    "action":"type",
+    "content":"Hello, World!"
+}
+
+```
+
+#### unicode:
+
+insert a unicode character.
+
+##### Parameters:
+
+**code** - The hexidecimal number code for unicode characters
+
+##### Example
+```
+
+{
+    "action":"unicode",
+    "code":"1F600"
+}
+
+```
+
+
+#### XF86Symbol:
+
+Invoke a XF86Symbol (think media keys)
+
+##### Parameters:
+
+**symbol** - XF86Symbol (http://wiki.linuxquestions.org/wiki/XF86_keyboard_symbols)
+
+##### Example:
+
+```
+
+{
+    "action":"XF86Symbol",
+    "symbol":"XF86AudioLowerVolume"
+}
+
+```
+
+## Issues
+### Current Bugs
+* Reload functionality not working
