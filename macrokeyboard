@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+# -*- coding: latin-1 -*-
+
+import evdev
+import os
+import sys
+import getopt
+from wmctrl import Window
+from Actioner import Actioner
+from modifierkeys import Modifierkeys
+import notify2 as notify
+from configuration import Configuration
+from keyLocks import KeyLocks
+
+def print_help():
+    helptext="""\
+Usage:
+  macrokeyboard -v -c <config_file>
+
+Configuration file is in json format and needs to have device defined.
+-v  :               Verbose. Use this mode if you want to see the key codes and
+                    the window classes (great for when writing a config file)
+-c <config_file> :  Use config file. Particularly useful when you want multiple
+                    macro keyboards.
+/"""
+    print("\n\n"+helptext+"\n\n")
+
+class Controller:
+    def __init__( self, configfile ):
+        self.modifierkeys = None
+        self.keys = []
+        self.rawkeyboard = None
+        self.config = Configuration( configfile )
+        self.device = self.config.device
+        self.modifierkeys = self.config.modifierkeys
+        self.actioner = Actioner()
+        self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+        # pass any mime type lists to actioner...
+
+    def initDevice(self):
+        if os.access( self.device,os. R_OK ):
+            self.rawkeyboard = evdev.InputDevice(self.device)
+            try:
+                self.rawkeyboard.grab()
+            except Exception as e:
+                if e.errno == 16:
+                    print("Unable to get exclusive lock on device.")
+                    print("Is another instance of macrokeyboard already running on that device?")
+                else:
+                    print(e)
+                exit(1)
+
+        else:
+            sys.exit('No read access to input device')
+
+    def loop(self, VERBOSE):
+        self.initDevice()
+
+        keyLocks = KeyLocks()    
+        if "disable_capslock" in self.config.config:
+            if self.config.config["disable_capslock"]:
+                keyLocks.DisableCaps()
+        if "force_numlock" in self.config.config:
+            if self.config.config["force_numlock"]:
+                keyLocks.ForceNum()
+
+        if "launch-notify" in self.config.config:
+            if self.config.config["launch-notify"]:
+                self.actioner.setNotifications()
+        while True:
+            for event in self.rawkeyboard.read_loop():
+                keyLocks.checkStates()
+                if event.type == evdev.ecodes.EV_KEY:
+                    key = evdev.categorize(event)
+                    if key.keystate == key.key_down or key.keystate == key.key_up:
+                        try:
+                            active_window = Window.get_active()
+                        except:
+                            pass
+                        if VERBOSE:
+                            print( 'Keycode: ' + key.keycode )
+                            try:
+                                print( '  wm_class:       ' + active_window.wm_class )
+                                print( '  wm_window_role: ' + active_window.wm_window_role )
+                            except:
+                                pass
+
+                        action_info = ""
+                        keyconfigs = self.config.find(key.keycode)
+                        if keyconfigs:
+                            noMod = ""
+                            for i, config in enumerate(keyconfigs):
+                                if "modifiers" in config:
+                                    if self.modifierkeys.checkmodifiers(config["modifiers"].split('+')):
+                                        action_info = keyconfigs[i]
+                                else:
+                                    noMod = keyconfigs[i]
+                            if action_info == "" and noMod != "":
+                                action_info = noMod
+                            if "context_class" in action_info:
+                                if active_window.wm_class in action_info["context_class"]:
+                                    action_info = action_info["context_class"][active_window.wm_class]
+                            if "context_role" in action_info:
+                                if active_window.wm_window_role in action_info["context_role"]:
+                                    action_info = action_info["context_role"][active_window.wm_window_role]
+                        if( key.keystate == key.key_down ):
+                            if not self.modifierkeys.keydown( key.keycode ):
+                                if 'action' in action_info:
+                                    if action_info['action'] == 'reload':
+                                        self.config.readConfiguration()
+                                        self.actioner.populateMimeLists(self.config.config['mimetypelists'])
+                                    elif action_info['action'] == 'exit':
+                                        sys.exit(0)
+                                    else:
+                                        if action_info['action'] == 'holdandrelease':
+                                            action_info = action_info["onhold"]
+                                        self.actioner.action(action_info)
+                            elif VERBOSE:
+                                print("Modifier pressed")
+                        else:
+                            if "action" in action_info:
+                                if action_info["action"] == "holdandrelease":
+                                    action_info = action_info["onrelease"]
+                                    self.actioner.action(action_info)
+                            self.modifierkeys.keyup( key.keycode )
+
+def main(argv):
+    # Commandline parameters
+    notify.init("MacroKeyboard")
+    configFile = os.path.join(os.path.expanduser('~'), '.macrokeyboard.json')
+    VERBOSE = False
+    try:
+        opts, _ = getopt.getopt(argv, "hvc:", ["help,verbose,config="])
+    except getopt.GetoptError:
+        print_help()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ["-h","--help"]:
+            print_help()
+            sys.exit()
+        elif opt in [ "-v", "--verbose" ]:
+            VERBOSE = True
+        elif opt in [ "-c", "--config" ]:
+            configFile = arg
+
+    controller = Controller(configFile)
+    while True:
+        try:
+            while True:
+                controller.loop(VERBOSE)
+        except KeyboardInterrupt:
+            sys.exit(0)
+        except OSError:
+            found = False
+            while not found:
+                # Assume the device has been unplugged. Nothing to do until device
+                # is plugged in again.
+                found=os.path.exists(controller.device)
+
+if __name__ == "__main__":
+    main([]) if len( sys.argv ) == 0 else main( sys.argv[ 1: ])
