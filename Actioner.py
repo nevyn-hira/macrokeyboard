@@ -35,7 +35,7 @@ class Actioner:
                             description = os.path.basename(actioninfo['executable']),
                             icon_path = self.launchicon,
                             duration = 2,
-                            urgency = Notification.URGENCY_CRITICAL
+                            urgency = "normal"
                         ).send()
                     except:
                         pass
