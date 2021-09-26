@@ -54,7 +54,6 @@ class Controller:
 
     def loop(self, VERBOSE):
         self.initDevice()
-
         keyLocks = KeyLocks()
         if "disable_capslock" in self.config.config:
             if self.config.config["disable_capslock"]:
@@ -67,8 +66,6 @@ class Controller:
                 self.actioner.setNotifications()
         while True:
             for event in self.rawkeyboard.read_loop():
-                # keyLocks.checkStates()
-                # key = evdev.categorize(event)
                 if event.type == evdev.ecodes.EV_KEY:
                     keyLocks.checkStates()
                     key = evdev.categorize(event)
@@ -84,9 +81,8 @@ class Controller:
                                 print( '  wm_window_role: ' + active_window.wm_window_role )
                             except:
                                 pass
-
                         action_info = ""
-                        keyconfigs = self.config.find(key.keycode)
+                        keyconfigs = self.config.find( key.keycode )
                         if keyconfigs:
                             noMod = ""
                             for i, config in enumerate(keyconfigs):
@@ -95,7 +91,7 @@ class Controller:
                                         action_info = keyconfigs[i]
                                 else:
                                     noMod = keyconfigs[i]
-                            if action_info == "" and noMod != "":
+                            if action_info == "" and noMod != "" and not self.modifierkeys.isModifiers():
                                 action_info = noMod
                             if "context_class" in action_info:
                                 if active_window.wm_class in action_info["context_class"]:
