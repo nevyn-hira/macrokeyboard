@@ -109,6 +109,8 @@ class Actioner:
 
 
     def execute(self, executable, parameters):
+        if executable.startswith('addon/'):
+            executable = executable.replace('addon/',os.getcwd()+'/')
         if(parameters):
             subprocess.call([executable] + shlex.split(parameters))
         else:
