@@ -27,7 +27,11 @@ class Actioner:
                 for a in sorted(actioninfo['chain']):
                     self.action( actioninfo['chain'][a] )
         elif action == 'switchto':
-            if(self.switchTo(actioninfo['classname'], actioninfo['executable'])):
+            if "executable" in actioninfo:
+                executable = actioninfo['executable']
+            else:
+                executable = ""
+            if(self.switchTo(actioninfo['classname'], executable )):
                 if(self.launchnotifications):
                     try:
                         Notification(
