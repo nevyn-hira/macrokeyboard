@@ -27,16 +27,15 @@ class Actioner:
                 for a in sorted(actioninfo['chain']):
                     self.action( actioninfo['chain'][a] )
         elif action == 'switchto':
+            executable = ""
             if "executable" in actioninfo:
                 executable = actioninfo['executable']
-            else:
-                executable = ""
-            if(self.switchTo(actioninfo['classname'], executable )):
-                if(self.launchnotifications):
+            if( self.switchTo( actioninfo['classname'], executable )):
+                if( self.launchnotifications ):
                     try:
                         Notification(
                             title = 'Launching',
-                            description = os.path.basename(actioninfo['executable']),
+                            description = os.path.basename( actioninfo['executable'] ),
                             icon_path = self.launchicon,
                             duration = 2,
                             urgency = "normal"
@@ -129,14 +128,14 @@ class Actioner:
     def switchTo(self, classname, command):
         windows = ''
         try:
-            windows = Window.by_class(classname)
+            windows = Window.by_class( classname )
         except ValueError:
             print(Window.list())
         if len(windows) > 0:
             windows[0].activate()
         else:
             if command != "":
-                subprocess.Popen(command)
+                subprocess.Popen( command )
                 return True
         return False
 
