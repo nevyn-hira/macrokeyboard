@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: latin-1 -*-
 
-import gi
+# import gi
 import subprocess
 import shlex
 import re
