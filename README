@@ -21,6 +21,14 @@ Author: Nevyn Hira (nevynh@gmail.com)
 
 This is a python script for turning old, otherwise dust collecting keyboards, into macrokeyboards.
 
+## Please note: ##
+
+This will not work on Wayland.
+
+Every now anad again I get the idea into my head that I'm totally going to rewrite this and it's going to have Wayland support and be awesome. The long and short of it though is that this code leans really havily on the work others have done in making amazing automaticion tools, such as xdotool and wmctrl, and this stuff just doesn't really exist for Wayland. I may be abl eot simulate some keypresses but that's about all I can do at the moment.
+
+BUT the functionality I really want, the ability to list windows and switch to windows (this is what I mainly use my macrokeyboard for), may only really be important to me. If that's the case, and others can make use of code that will just simulate keypresses, then I'm more than willing to write that. It's just that for the time being, if this is only going to be used by me, I'm in no hurry to use Wayland and the functionality that I want just isn't easily implemented right now.
+
 ## What can it do?
 
 You can assign keys to be:
