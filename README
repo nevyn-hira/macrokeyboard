@@ -60,7 +60,7 @@ You can assign keys to be:
     * evdev
 ### Installation of Dependencies on Ubuntu
 sudo apt-get install xdotool libnotify-bin pip3
-pip3 install pynput python-magic py-notifier pyperclip evdev
+pip3 install pynput python-magic py-notifier pyperclip evdev notify2
 
 ## Configuration:
 Configuration is via a json file. It is looked for in ~/.macrokeyboard.json. This allows for complex data structures to be defined (but doesn't allow for comments. It should be trivial to go and strip out comments before doing anything on it...). You can find key symbols and window class names by running macrokeyboard in a terminal, switching to the desired window, and pressing the desired key. Then go back to the terminal window and copy those values.
