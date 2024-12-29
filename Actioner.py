@@ -5,20 +5,15 @@ import subprocess
 import magic
 import os
 from wmctrl import Window
-from pynotifier import Notification
 import pyperclip
 
 class Actioner:
     def __init__(self):
         self.keyboardcontroller = keyboardController()
-        self.launchnotifications = False
         self.launchicon = os.path.dirname(os.path.realpath(__file__)) + '/launch.png'
 
     def populateMimeLists(self, mimelists):
         self.mimelists = mimelists
-
-    def setNotifications(self):
-        self.launchnotifications = True
 
     def action(self, actioninfo):
         action = actioninfo['action']
@@ -31,17 +26,7 @@ class Actioner:
             if "executable" in actioninfo:
                 executable = actioninfo['executable']
             if( self.switchTo( actioninfo['classname'], executable )):
-                if( self.launchnotifications ):
-                    try:
-                        Notification(
-                            title = 'Launching',
-                            description = os.path.basename( actioninfo['executable'] ),
-                            icon_path = self.launchicon,
-                            duration = 2,
-                            urgency = "normal"
-                        ).send()
-                    except:
-                        pass
+                pass
         elif action == 'XF86Symbol':
             self.pressXF86Symbol(
                 actioninfo['symbol'])
